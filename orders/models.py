@@ -1,3 +1,72 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+class Product(models.Model):
+    name = models.CharField(_("Название"), max_length=100)
+    price = models.DecimalField(_("Цена"), max_digits=10, decimal_places=2)
+    image = models.ImageField(_("Изображение"), upload_to='products/')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _("Продукт")
+        verbose_name_plural = _("Продукты")
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('P', 'В ожидании'),
+        ('C', 'Завершен'),
+        ('F', 'Неудачно'),
+    ]
+
+    user = models.ForeignKey(User, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, verbose_name=_("Продукты"), through='OrderProduct')
+    status = models.CharField(_("Статус"), max_length=1, choices=STATUS_CHOICES, default='P')
+    created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
+
+    def __str__(self):
+        return f"Заказ {self.id} от {self.user.username}"
+
+    class Meta:
+        verbose_name = _("Заказ")
+        verbose_name_plural = _("Заказы")
+
+class OrderProduct(models.Model):
+    order = models.ForeignKey(Order, verbose_name=_("Заказ"), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name=_("Продукт"), on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(_("Количество"))
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    class Meta:
+        verbose_name = _("Продукт заказа")
+        verbose_name_plural = _("Продукты заказа")
+
+class Review(models.Model):
+    user = models.ForeignKey(User, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name=_("Продукт"), on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(_("Рейтинг"))
+    comment = models.TextField(_("Комментарий"))
+    created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
+
+    def __str__(self):
+        return f"Отзыв {self.id} от {self.user.username}"
+
+    class Meta:
+        verbose_name = _("Отзыв")
+        verbose_name_plural = _("Отзывы")
+
+class Report(models.Model):
+    date = models.DateField(_("Дата"))
+    total_sales = models.DecimalField(_("Общие продажи"), max_digits=10, decimal_places=2)
+    total_orders = models.PositiveIntegerField(_("Общее количество заказов"))
+
+    def __str__(self):
+        return f"Отчет за {self.date}"
+
+    class Meta:
+        verbose_name = _("Отчет")
+        verbose_name_plural = _("Отчеты")
