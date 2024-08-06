@@ -4,18 +4,18 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Загрузка конфигурации из config.json
 with open(os.path.join(BASE_DIR, 'config.json')) as config_file:
     config = json.load(config_file)
 
-SECRET_KEY = 'django-insecure-)m*(m4k=ee(*m8gpbmp2t-(6v)p%w4d%7@w2)@uj@5s3+4_b&('
+# Получение секретного ключа из конфигурационного файла, если он отсутствует, используется значение по умолчанию (замените на ваше собственное значение)
+SECRET_KEY = config.get('secret_key', 'django-insecure-)m*(m4k=ee(*m8gpbmp2t-(6v)p%w4d%7@w2)@uj@5s3+4_b&(')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Получение значения DEBUG из конфигурационного файла, если оно отсутствует, используется значение False
+DEBUG = config.get('debug', False)
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
+# Разрешенные хосты, берутся из конфигурационного файла
+ALLOWED_HOSTS = config.get('allowed_hosts', ['fd.vivikey.tech'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'orders.apps.OrdersConfig',
-#	'orders',
     'rest_framework',
 ]
 
@@ -44,8 +43,7 @@ ROOT_URLCONF = 'flower_delivery.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -60,19 +58,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'flower_delivery.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -89,8 +80,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -98,7 +87,6 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -120,5 +108,9 @@ REST_FRAMEWORK = {
 AIORGRAM_API_TOKEN = config['telegram_token']
 WEBHOOK_URL = config['webhook_url']
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Security settings for production
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
