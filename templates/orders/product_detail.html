@@ -1,32 +1,29 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ product.name }}</title>
-</head>
-<body>
-    <h1>{{ product.name }}</h1>
-    <p>Цена: {{ product.price }} руб.</p>
-    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-    <h2>Отзывы</h2>
-    <ul>
-        {% for review in reviews %}
-            <li>
-                <strong>{{ review.user.username }}</strong>: {{ review.comment }} ({{ review.rating }} из 5)
-            </li>
-        {% endfor %}
-    </ul>
-    <h2>Добавить отзыв</h2>
-    <form method="post" action="{% url 'add_review' product_id=product.id %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Добавить</button>
-    </form>
-    <h2>Заказать</h2>
-    <form method="post" action="{% url 'order_create' product_id=product.id %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Заказать</button>
-    </form>
-</body>
-</html>
+{% extends 'orders/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<h2>{{ product.name }}</h2>
+<p>Цена: {{ product.price }} руб.</p>
+<img src="{{ product.image.url }}" alt="{{ product.name }}">
+<h3>Отзывы</h3>
+<ul>
+    {% for review in reviews %}
+        <li>
+            <strong>{{ review.user.username }}</strong>: {{ review.comment }} ({{ review.rating }} из 5)
+        </li>
+    {% endfor %}
+</ul>
+<h3>Добавить отзыв</h3>
+<form method="post" action="{% url 'add_review' product_id=product.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Добавить</button>
+</form>
+<h3>Заказать</h3>
+<form method="post" action="{% url 'order_create' product_id=product.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Заказать</button>
+</form>
+{% endblock %}

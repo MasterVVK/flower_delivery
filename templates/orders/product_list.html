@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Каталог продуктов</title>
-</head>
-<body>
-    <h1>Каталог продуктов</h1>
-    <ul>
-        {% for product in products %}
-            <li>
-                <a href="{% url 'product_detail' pk=product.pk %}">{{ product.name }}</a> - {{ product.price }} руб.
-            </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'orders/base.html' %}
+
+{% block title %}Каталог продуктов{% endblock %}
+
+{% block content %}
+<h2>Каталог продуктов</h2>
+<ul>
+    {% for product in products %}
+        <li>
+            <a href="{% url 'product_detail' pk=product.pk %}">{{ product.name }}</a> - {{ product.price }} руб.
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
