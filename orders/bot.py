@@ -7,6 +7,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 from aiohttp import web
+from aiogram import Router
 
 # Добавление корневой директории проекта в sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,9 +32,10 @@ CHAT_ID = config['chat_id']
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# Инициализация бота и диспетчера
+# Инициализация бота, диспетчера и маршрутизатора
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(storage=MemoryStorage(), fsm_strategy=FSMStrategy.USER_IN_CHAT)
+router = Router()
 
 # Функция для отправки уведомления о новом заказе
 async def send_new_order_notification(order):
@@ -43,11 +45,11 @@ async def send_new_order_notification(order):
     await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # Обработчики команд
-@dp.message_handler(commands=['start'])
+@router.message(commands=['start'])
 async def send_welcome(message: types.Message):
     await message.reply("Привет! Я бот для управления заказами.")
 
-@dp.message_handler(commands=['catalog'])
+@router.message(commands=['catalog'])
 async def send_catalog(message: types.Message):
     products = Product.objects.all()
     response = "Каталог продуктов:\n"
@@ -66,6 +68,9 @@ async def on_shutdown(app: web.Application):
 app = web.Application()
 app.on_startup.append(on_startup)
 app.on_shutdown.append(on_shutdown)
+
+# Подключение маршрутизатора к диспетчеру
+dp.include_router(router)
 dp.setup(app)
 
 if __name__ == '__main__':
