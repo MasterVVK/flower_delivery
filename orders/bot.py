@@ -67,8 +67,8 @@ async def on_shutdown(app: web.Application):
 async def handle_webhook(request):
     update = await request.json()
     async with bot:
-        await bot.set_current()
-        await dp.set_current()
+        Bot.set_current(bot)
+        Dispatcher.set_current(dp)
         update = types.Update(**update)
         await dp.process_update(update)
     return web.Response()
