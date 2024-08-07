@@ -8,12 +8,12 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 from aiohttp import web
 
+# Добавление корневой директории проекта в sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # Установка переменной окружения для настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
 django.setup()
-
-# Добавление корневой директории проекта в sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Импорт моделей после настройки Django
 from orders.models import Product, Order, OrderProduct
