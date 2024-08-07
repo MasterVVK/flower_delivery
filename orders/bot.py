@@ -12,6 +12,9 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import uvicorn
 
 # Добавление корневой директории проекта в sys.path
@@ -50,6 +53,8 @@ async def lifespan(app: FastAPI):
 
 # Инициализация FastAPI
 app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 # Обработчики команд
 @dp.message(CommandStart())
@@ -69,6 +74,7 @@ async def send_catalog(message: types.Message):
 async def webhook(request: Request) -> None:
     update = types.Update.model_validate(await request.json(), context={"bot": bot})
     await dp.feed_update(bot, update)
+    return {"status": "ok"}
 
 # Запуск приложения
 if __name__ == "__main__":
