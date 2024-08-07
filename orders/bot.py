@@ -3,7 +3,7 @@ import os
 import logging
 import sys
 from aiohttp import web
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, types
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 # Добавление корневой директории проекта в sys.path
@@ -35,11 +35,11 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
 # Обработчики команд
-@dp.message(F.text == '/start')
+@dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     await message.answer("Привет! Я бот для управления заказами.")
 
-@dp.message(F.text == '/catalog')
+@dp.message_handler(commands=['catalog'])
 async def send_catalog(message: types.Message):
     products = Product.objects.all()
     response = "Каталог продуктов:\n"
