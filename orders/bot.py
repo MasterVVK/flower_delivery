@@ -3,7 +3,7 @@ import os
 import logging
 import sys
 import django
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 from aiohttp import web
@@ -45,11 +45,11 @@ async def send_new_order_notification(order):
     await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # Обработчики команд
-@router.message(commands=['start'])
+@router.message(F.text == '/start')
 async def send_welcome(message: types.Message):
     await message.reply("Привет! Я бот для управления заказами.")
 
-@router.message(commands=['catalog'])
+@router.message(F.text == '/catalog')
 async def send_catalog(message: types.Message):
     products = Product.objects.all()
     response = "Каталог продуктов:\n"
