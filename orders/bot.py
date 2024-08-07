@@ -55,6 +55,13 @@ async def create_order(message: Message):
     order_product.save()
     await message.answer(f"Заказ на {quantity} x {product.name} успешно создан!")
 
+async def notify_new_order(order):
+    message = f"Новый заказ №{order.id}\nПользователь: {order.user.username}\nСтатус: {order.get_status_display()}\n"
+    message += "Продукты:\n"
+    for order_product in order.orderproduct_set.all():
+        message += f"{order_product.quantity} x {order_product.product.name}\n"
+    await bot.send_message(chat_id=YOUR_CHAT_ID, text=message)
+
 if __name__ == '__main__':
     from aiogram import executor
     executor.start_polling(dp, skip_updates=True)
