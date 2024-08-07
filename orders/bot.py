@@ -64,5 +64,5 @@ SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
 
 # Запуск приложения
 if __name__ == '__main__':
-    setup_application(app, dp, bot)
+    setup_application(app, dp)
     web.run_app(app, host='0.0.0.0', port=5000)
