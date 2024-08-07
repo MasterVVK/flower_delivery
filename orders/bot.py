@@ -64,8 +64,17 @@ async def on_startup(dp: Dispatcher):
 async def on_shutdown(dp: Dispatcher):
     await bot.delete_webhook()
 
+async def handle_webhook(request):
+    update = await request.json()
+    Bot.set_current(bot)
+    Dispatcher.set_current(dp)
+    update = types.Update(**update)
+    await dp.process_update(update)
+    return web.Response()
+
 # Создание и настройка веб-приложения
 app = web.Application()
+app.router.add_post(WEBHOOK_PATH, handle_webhook)
 app.on_startup.append(lambda app: on_startup(dp))
 app.on_shutdown.append(lambda app: on_shutdown(dp))
 
