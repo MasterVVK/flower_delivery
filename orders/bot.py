@@ -78,6 +78,7 @@ async def webhook(request: Request) -> None:
 # Основная страница
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
+    # Возвращает основную HTML-страницу (например, index.html) при доступе к корню веб-сайта
     return templates.TemplateResponse("index.html", {"request": request})
 
 # Запуск приложения
