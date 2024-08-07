@@ -4,7 +4,7 @@ import logging
 import sys
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiogram.dispatcher.webhook import SimpleRequestHandler, setup_application
 
 # Добавление корневой директории проекта в sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -32,7 +32,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot=bot)
+dp = Dispatcher(bot)
 
 # Обработчики команд
 @dp.message_handler(commands=['start'])
