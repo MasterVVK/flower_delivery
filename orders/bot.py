@@ -4,7 +4,7 @@ import logging
 import sys
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
-from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 # Добавление корневой директории проекта в sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,8 +31,8 @@ CHAT_ID = config['chat_id']
 logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота и диспетчера
-bot = Bot(token=API_TOKEN, session=AiohttpSession())
-dp = Dispatcher()
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher(bot=bot)
 
 # Обработчики команд
 @dp.message_handler(commands=['start'])
@@ -47,25 +47,22 @@ async def send_catalog(message: types.Message):
         response += f"{product.name} - {product.price} руб.\n"
     await message.reply(response)
 
-# Настройка вебхуков
+# Настройка aiohttp
 async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL)
 
 async def on_shutdown(app):
     await bot.delete_webhook()
 
-# Обработчик вебхуков
-async def handle_webhook(request):
-    update = types.Update(**await request.json())
-    await dp.process_update(update)
-    return web.Response()
-
-# Инициализация aiohttp
+# Создание приложения aiohttp
 app = web.Application()
-app.router.add_post(WEBHOOK_PATH, handle_webhook)
 app.on_startup.append(on_startup)
 app.on_shutdown.append(on_shutdown)
 
-# Запуск сервера
+# Настройка обработчика запросов
+SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
+
+# Запуск приложения
 if __name__ == '__main__':
+    setup_application(app, dp, bot)
     web.run_app(app, host='0.0.0.0', port=5000)
