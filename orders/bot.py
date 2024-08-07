@@ -1,17 +1,22 @@
 import json
 import os
 import logging
+import sys
 import django
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 from aiohttp import web
 
-from orders.models import Product, Order, OrderProduct
-
 # Установка переменной окружения для настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
 django.setup()
+
+# Добавление корневой директории проекта в sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Импорт моделей после настройки Django
+from orders.models import Product, Order, OrderProduct
 
 # Чтение конфигурационного файла
 with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')) as config_file:
