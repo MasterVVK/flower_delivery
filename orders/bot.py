@@ -58,20 +58,20 @@ async def send_catalog(message: types.Message):
     await message.reply(response)
 
 # Настройки вебхука
-async def on_startup(app: web.Application):
+async def on_startup(dp: Dispatcher):
     await bot.set_webhook(WEBHOOK_URL)
 
-async def on_shutdown(app: web.Application):
+async def on_shutdown(dp: Dispatcher):
     await bot.delete_webhook()
 
 # Создание и настройка веб-приложения
 app = web.Application()
-app.on_startup.append(on_startup)
-app.on_shutdown.append(on_shutdown)
+app.on_startup.append(lambda app: on_startup(dp))
+app.on_shutdown.append(lambda app: on_shutdown(dp))
 
 # Подключение маршрутизатора к диспетчеру
 dp.include_router(router)
-dp.setup(app)
 
+# Запуск веб-сервера
 if __name__ == '__main__':
     web.run_app(app, host='0.0.0.0', port=5000)
