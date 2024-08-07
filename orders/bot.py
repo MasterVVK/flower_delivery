@@ -66,17 +66,18 @@ async def on_shutdown(app: web.Application):
 
 async def handle_webhook(request):
     update = await request.json()
-    Bot.set_current(bot)
-    Dispatcher.set_current(dp)
-    update = types.Update(**update)
-    await dp.process_update(update)
+    async with bot:
+        await bot.set_current()
+        await dp.set_current()
+        update = types.Update(**update)
+        await dp.process_update(update)
     return web.Response()
 
 # Создание и настройка веб-приложения
 app = web.Application()
 app.router.add_post(WEBHOOK_PATH, handle_webhook)
-app.on_startup.append(lambda app: on_startup(dp))
-app.on_shutdown.append(lambda app: on_shutdown(dp))
+app.on_startup.append(lambda app: on_startup(app))
+app.on_shutdown.append(lambda app: on_shutdown(app))
 
 # Подключение маршрутизатора к диспетчеру
 dp.include_router(router)
