@@ -2,23 +2,16 @@ import json
 import os
 import logging
 import sys
-from contextlib import asynccontextmanager
-
-import django
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.strategy import FSMStrategy
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
-from fastapi import FastAPI, Request
-import uvicorn
+from aiohttp import web
+from aiogram import Bot, Dispatcher, types
+from aiogram.client.session.aiohttp import AiohttpSession
 
 # Добавление корневой директории проекта в sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Установка переменной окружения для настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
+import django
 django.setup()
 
 # Импорт моделей после настройки Django
@@ -38,25 +31,15 @@ CHAT_ID = config['chat_id']
 logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота и диспетчера
-bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
-
-# Настройка вебхуков
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await bot.set_webhook(url=WEBHOOK_URL, allowed_updates=dp.resolve_used_update_types(), drop_pending_updates=True)
-    yield
-    await bot.delete_webhook()
-
-# Инициализация FastAPI
-app = FastAPI(lifespan=lifespan)
+bot = Bot(token=API_TOKEN, session=AiohttpSession())
+dp = Dispatcher(bot)
 
 # Обработчики команд
-@dp.message(CommandStart())
-async def start(message: types.Message) -> None:
+@dp.message_handler(commands=['start'])
+async def start(message: types.Message):
     await message.answer("Привет! Я бот для управления заказами.")
 
-@dp.message(F.text == '/catalog')
+@dp.message_handler(commands=['catalog'])
 async def send_catalog(message: types.Message):
     products = Product.objects.all()
     response = "Каталог продуктов:\n"
@@ -64,13 +47,25 @@ async def send_catalog(message: types.Message):
         response += f"{product.name} - {product.price} руб.\n"
     await message.reply(response)
 
-# Обработчик вебхуков
-@app.post("/webhook")
-async def webhook(request: Request) -> None:
-    update = types.Update.model_validate(await request.json(), context={"bot": bot})
-    await dp.feed_update(bot, update)
-    return {"status": "ok"}
+# Настройка вебхуков
+async def on_startup(app):
+    await bot.set_webhook(WEBHOOK_URL)
 
-# Запуск приложения
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+async def on_shutdown(app):
+    await bot.delete_webhook()
+
+# Обработчик вебхуков
+async def handle_webhook(request):
+    update = types.Update(**await request.json())
+    await dp.process_update(update)
+    return web.Response()
+
+# Инициализация aiohttp
+app = web.Application()
+app.router.add_post(WEBHOOK_PATH, handle_webhook)
+app.on_startup.append(on_startup)
+app.on_shutdown.append(on_shutdown)
+
+# Запуск сервера
+if __name__ == '__main__':
+    web.run_app(app, host='0.0.0.0', port=5000)
