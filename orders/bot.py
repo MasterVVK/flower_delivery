@@ -32,7 +32,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN, session=AiohttpSession())
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Обработчики команд
 @dp.message_handler(commands=['start'])
