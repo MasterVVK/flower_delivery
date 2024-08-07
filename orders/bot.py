@@ -58,10 +58,10 @@ async def send_catalog(message: types.Message):
     await message.reply(response)
 
 # Настройки вебхука
-async def on_startup(dp: Dispatcher):
+async def on_startup(app: web.Application):
     await bot.set_webhook(WEBHOOK_URL)
 
-async def on_shutdown(dp: Dispatcher):
+async def on_shutdown(app: web.Application):
     await bot.delete_webhook()
 
 async def handle_webhook(request):
