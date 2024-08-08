@@ -31,7 +31,6 @@ API_TOKEN = config['telegram_token']
 WEBHOOK_HOST = config['webhook_url']
 WEBHOOK_PATH = '/webhook/'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-CHAT_ID = config['chat_id']
 
 # Настройка логгирования
 logging.basicConfig(level=logging.INFO)
@@ -47,14 +46,6 @@ dp['bot'] = bot
 @dp.message(F.text == '/start')
 async def start(message: types.Message):
     await message.answer("Привет! Я бот для управления заказами. Вы будете получать уведомления о новых заказах.")
-
-# Функция уведомления о новом заказе
-async def notify_new_order(order):
-    message = f"Новый заказ №{order.id}\nПользователь: {order.user.username}\nСтатус: {order.get_status_display()}\n"
-    message += "Продукты:\n"
-    for order_product in order.orderproduct_set.all():
-        message += f"{order_product.quantity} x {order_product.product.name}\n"
-    await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # Обработчик запуска aiohttp
 async def on_startup(app):
