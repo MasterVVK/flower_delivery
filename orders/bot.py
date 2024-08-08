@@ -9,8 +9,12 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 # Настройка путей
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Загрузка настроек Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
+# Проверка, если скрипт запущен как основной
+if __name__ == '__main__':
+    # Загрузка настроек Django
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
+    import django
+    django.setup()
 
 # Импорт моделей Django
 from orders.models import Product, Order, OrderProduct
@@ -34,7 +38,10 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
+dp = Dispatcher()  # Создаем диспетчер без аргументов
+
+# Добавляем бота в диспетчер
+dp['bot'] = bot
 
 # Обработчик команды /start
 @dp.message(F.text == '/start')
