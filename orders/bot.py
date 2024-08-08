@@ -7,24 +7,20 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 # Устанавливаем текущий рабочий каталог на уровень выше, если это не так
-if os.path.basename(os.getcwd()) == 'orders':
-    os.chdir('..')
+current_path = os.path.dirname(os.path.abspath(__file__))
+parent_path = os.path.dirname(current_path)
+sys.path.append(parent_path)
 
-# Настройка путей
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-# Проверка, если скрипт запущен как основной
-if __name__ == '__main__':
-    # Загрузка настроек Django
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
-    import django
-    django.setup()
+# Загрузка настроек Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
+import django
+django.setup()
 
 # Импорт моделей Django
 from orders.models import Product, Order, OrderProduct
 
 # Загрузка конфигурации
-config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
+config_path = os.path.join(parent_path, 'config.json')
 if not os.path.exists(config_path):
     raise FileNotFoundError(f"Файл конфигурации не найден: {config_path}")
 
