@@ -1,12 +1,12 @@
-{% extends 'orders/base.html' %}
+<!-- templates/orders/order_form.html -->
 
-{% block title %}Оформление заказа{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h2>Оформление заказа на {{ product.name }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Оформить заказ</button>
-</form>
+    <h2>Создать заказ</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Создать</button>
+    </form>
 {% endblock %}
