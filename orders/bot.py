@@ -6,19 +6,19 @@ from aiohttp import web
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-# Добавление корневой директории проекта в sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Настройка путей
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Установка переменной окружения для настройки Django
+# Загрузка настроек Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
 import django
 django.setup()
 
-# Импорт моделей после настройки Django
+# Импорт моделей Django
 from orders.models import Product, Order, OrderProduct
 
-# Чтение конфигурационного файла
-with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')) as config_file:
+# Загрузка конфигурации
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')) as config_file:
     config = json.load(config_file)
 
 API_TOKEN = config['telegram_token']
@@ -27,39 +27,40 @@ WEBHOOK_PATH = '/webhook/'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 CHAT_ID = config['chat_id']
 
-# Настройка логирования
+# Настройка логгирования
 logging.basicConfig(level=logging.INFO)
 
-# Инициализация бота и диспетчера
+# Инициализация бота
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
-# Обработчики команд
+# Обработчик команды /start
 @dp.message(F.text == '/start')
 async def start(message: types.Message):
-    await message.answer("Привет! Я бот для управления заказами.")
+    await message.answer("Привет! Я бот для управления заказами. Вы будете получать уведомления о новых заказах.")
 
-@dp.message(F.text == '/catalog')
-async def send_catalog(message: types.Message):
-    products = Product.objects.all()
-    response = "Каталог продуктов:\n"
-    for product in products:
-        response += f"{product.name} - {product.price} руб.\n"
-    await message.reply(response)
+# Функция уведомления о новом заказе
+async def notify_new_order(order):
+    message = f"Новый заказ №{order.id}\nПользователь: {order.user.username}\nСтатус: {order.get_status_display()}\n"
+    message += "Продукты:\n"
+    for order_product in order.orderproduct_set.all():
+        message += f"{order_product.quantity} x {order_product.product.name}\n"
+    await bot.send_message(chat_id=CHAT_ID, text=message)
 
-# Настройка aiohttp
+# Обработчик запуска aiohttp
 async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL)
 
+# Обработчик остановки aiohttp
 async def on_shutdown(app):
     await bot.delete_webhook()
 
-# Создание приложения aiohttp
+# Настройка приложения aiohttp
 app = web.Application()
 app.on_startup.append(on_startup)
 app.on_shutdown.append(on_shutdown)
 
-# Настройка обработчика запросов
+# Регистрация SimpleRequestHandler
 SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
 
 # Запуск приложения
