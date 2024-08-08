@@ -6,5 +6,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
-    path('', include('orders.urls')),  # Предполагаем, что есть основное приложение orders
+    path('', include('orders.urls')),  # Маршруты для приложения orders
 ]

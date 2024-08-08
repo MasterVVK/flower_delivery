@@ -1,16 +1,19 @@
+<!-- templates/base.html -->
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}FlowerDelivery{% endblock %}</title>
+    {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <header>
-        <h1><a href="{% url 'home' %}">FlowerDelivery</a></h1>
+        <h1><a href="{% url 'product_list' %}">FlowerDelivery</a></h1>
         <nav>
             <ul>
-                <li><a href="{% url 'home' %}">Главная</a></li>
+                <li><a href="{% url 'product_list' %}">Главная</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'profile' %}">Профиль</a></li>
                     <li><a href="{% url 'logout' %}">Выйти</a></li>

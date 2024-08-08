@@ -34,7 +34,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Обработчик команды /start
 @dp.message(F.text == '/start')
