@@ -11,14 +11,16 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Загрузка настроек Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flower_delivery.settings')
-import django
-django.setup()
 
 # Импорт моделей Django
 from orders.models import Product, Order, OrderProduct
 
 # Загрузка конфигурации
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')) as config_file:
+config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')
+if not os.path.exists(config_path):
+    raise FileNotFoundError(f"Файл конфигурации не найден: {config_path}")
+
+with open(config_path) as config_file:
     config = json.load(config_file)
 
 API_TOKEN = config['telegram_token']
