@@ -2,7 +2,7 @@ from django.shortcuts import render
 import os
 
 def list_files(request, path=''):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Получить корневую директорию проекта
+    base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     target_dir = os.path.join(base_dir, path)
     files = []
     dirs = []
@@ -21,7 +21,7 @@ def list_files(request, path=''):
     return render(request, 'fileviewer/list_files.html', context)
 
 def view_file(request, path):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Получить корневую директорию проекта
+    base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
     if 'config.json' in file_path:
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
