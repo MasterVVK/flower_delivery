@@ -11,10 +11,9 @@ def list_files(request, path=''):
     dirs = []
     try:
         for item in os.listdir(target_dir):
-            # Проверка, находится ли элемент в списке исключаемых
-            if item in EXCLUDE_FILES_AND_DIRS:
-                continue
-            # Определение, является ли элемент файлом или папкой
+            item_path = os.path.join(path, item)  # Получить относительный путь
+            if item in EXCLUDE_FILES_AND_DIRS or item_path in EXCLUDE_FILES_AND_DIRS:
+                continue  # Исключить файлы и папки из списка
             if os.path.isfile(os.path.join(target_dir, item)):
                 files.append(item)
             else:
@@ -32,8 +31,7 @@ def view_file(request, path):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
     file_name = os.path.basename(file_path)
-    # Проверка, находится ли файл в списке исключаемых
-    if file_name in EXCLUDE_FILES_AND_DIRS:
+    if file_name in EXCLUDE_FILES_AND_DIRS or path in EXCLUDE_FILES_AND_DIRS:
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     try:
         with open(file_path, 'r') as file:
