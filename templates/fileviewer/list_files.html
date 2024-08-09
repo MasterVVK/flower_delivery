@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Files and Directories</title>
+</head>
+<body>
+    <h1>Files and Directories</h1>
+    <ul>
+        {% for dir in dirs %}
+        <li><a href="{% url 'list_files' dir %}">{{ dir }}/</a></li>
+        {% endfor %}
+        {% for file in files %}
+        <li><a href="{% url 'view_file' file %}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

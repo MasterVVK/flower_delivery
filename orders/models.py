@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 class Product(models.Model):
@@ -21,7 +21,7 @@ class Order(models.Model):
         ('F', 'Неудачно'),
     ]
 
-    user = models.ForeignKey(User, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, verbose_name=_("Продукты"), through='OrderProduct')
     status = models.CharField(_("Статус"), max_length=1, choices=STATUS_CHOICES, default='P')
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
@@ -46,7 +46,7 @@ class OrderProduct(models.Model):
         verbose_name_plural = _("Продукты заказа")
 
 class Review(models.Model):
-    user = models.ForeignKey(User, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name=_("Продукт"), on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(_("Рейтинг"))
     comment = models.TextField(_("Комментарий"))
