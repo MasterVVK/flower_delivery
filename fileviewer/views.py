@@ -34,12 +34,9 @@ def list_files(request, path=''):
 def view_file(request, path):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
-    file_name = os.path.basename(file_path)
     logger.debug(f"Проверка файла: {file_path}")
-    logger.debug(f"Базовый каталог: {base_dir}")
-    logger.debug(f"Файл: {file_name}")
-    if file_name in EXCLUDE_FILES_AND_DIRS or path in EXCLUDE_FILES_AND_DIRS:
-        logger.debug(f"Доступ к файлу {file_name} запрещен.")
+    if os.path.basename(file_path) in EXCLUDE_FILES_AND_DIRS:
+        logger.debug(f"Доступ к файлу {file_path} запрещен.")
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     try:
         with open(file_path, 'r') as file:
