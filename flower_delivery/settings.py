@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
     'rest_framework',
     'users',
+    'fileviewer',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +119,5 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+AUTH_USER_MODEL = 'users.CustomUser'
