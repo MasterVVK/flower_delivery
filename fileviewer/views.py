@@ -31,12 +31,18 @@ def view_file(request, path):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
     file_name = os.path.basename(file_path)
+    # Добавим отладочную информацию
+    print(f"Проверка файла: {file_path}")
+    print(f"Базовый каталог: {base_dir}")
+    print(f"Файл: {file_name}")
     if file_name in EXCLUDE_FILES_AND_DIRS or path in EXCLUDE_FILES_AND_DIRS:
+        print(f"Доступ к файлу {file_name} запрещен.")
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     try:
         with open(file_path, 'r') as file:
             content = file.read()
     except FileNotFoundError:
+        print(f"Файл не найден: {file_path}")
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     context = {
         'content': content,
