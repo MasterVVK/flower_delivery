@@ -25,8 +25,11 @@ def view_file(request, path):
     file_path = os.path.join(base_dir, path)
     if 'config.json' in file_path:
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
-    with open(file_path, 'r') as file:
-        content = file.read()
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+    except FileNotFoundError:
+        return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     context = {
         'content': content,
         'file_path': path,
