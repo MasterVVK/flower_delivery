@@ -8,7 +8,7 @@ logger = logging.getLogger('django')
 EXCLUDE_FILES_AND_DIRS = ['config.json', 'secret_folder', 'another_secret_file.txt']
 
 def list_files(request, path=''):
-    base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Получить корневую директорию проекта
     target_dir = os.path.join(base_dir, path)
     files = []
     dirs = []
@@ -32,7 +32,7 @@ def list_files(request, path=''):
     return render(request, 'fileviewer/list_files.html', context)
 
 def view_file(request, path):
-    base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Получить корневую директорию проекта
     file_path = os.path.join(base_dir, path)
     file_name = os.path.basename(file_path)
     logger.debug(f"Проверка файла: {file_path}")
