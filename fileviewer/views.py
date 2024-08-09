@@ -1,11 +1,19 @@
 from django.shortcuts import render
 import os
 import logging
+import json
+from pathlib import Path
 
 logger = logging.getLogger('django')
 
+# Загрузка конфигурации из config.json
+BASE_DIR = Path(__file__).resolve().parent.parent
+config_path = os.path.join(BASE_DIR, 'config.json')
+with open(config_path, 'r') as config_file:
+    config = json.load(config_file)
+
 # Список исключаемых файлов и папок
-EXCLUDE_FILES_AND_DIRS = ['config.json', 'secret_folder', 'another_secret_file.txt']
+EXCLUDE_FILES_AND_DIRS = config.get('exclude_files_and_dirs', [])
 
 def list_files(request, path=''):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
