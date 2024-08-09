@@ -7,10 +7,10 @@
     <h1>Files and Directories</h1>
     <ul>
         {% for dir in dirs %}
-        <li><a href="{% url 'list_files' path=dir %}">{{ dir }}/</a></li>
+        <li><a href="{% url 'list_files' path=dir %}">{{ dir|basename }}/</a></li>
         {% endfor %}
         {% for file in files %}
-        <li><a href="{% url 'view_file' path=file %}">{{ file }}</a></li>
+        <li><a href="{% url 'view_file' path=file %}">{{ file|basename }}</a></li>
         {% endfor %}
     </ul>
 </body>
