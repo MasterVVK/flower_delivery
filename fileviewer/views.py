@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import os
 
-EXCLUDE_FILES_AND_DIRS = ['config.json', '.git', 'venv', '.gitignore', 'flower_delivery.sock']
+EXCLUDE_FILES_AND_DIRS = ['config.json', 'secret_folder', 'another_secret_file.txt']
 
 def list_files(request, path=''):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
@@ -25,7 +25,8 @@ def list_files(request, path=''):
 def view_file(request, path):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
-    if any(exclude in file_path for exclude in EXCLUDE_FILES_AND_DIRS):
+    file_name = os.path.basename(file_path)
+    if file_name in EXCLUDE_FILES_AND_DIRS:
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     try:
         with open(file_path, 'r') as file:
