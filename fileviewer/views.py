@@ -1,6 +1,6 @@
-import logging
 from django.shortcuts import render
 import os
+import logging
 
 logger = logging.getLogger('django')
 
@@ -22,6 +22,7 @@ def list_files(request, path=''):
             else:
                 dirs.append(item)
     except FileNotFoundError:
+        logger.debug(f"Директория не найдена: {target_dir}")
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности папки
     context = {
         'dirs': dirs,
@@ -34,7 +35,6 @@ def view_file(request, path):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
     file_path = os.path.join(base_dir, path)
     file_name = os.path.basename(file_path)
-    # Добавим отладочную информацию
     logger.debug(f"Проверка файла: {file_path}")
     logger.debug(f"Базовый каталог: {base_dir}")
     logger.debug(f"Файл: {file_name}")
@@ -46,6 +46,12 @@ def view_file(request, path):
             content = file.read()
     except FileNotFoundError:
         logger.debug(f"Файл не найден: {file_path}")
+        return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
+    except PermissionError:
+        logger.debug(f"Нет прав доступа к файлу: {file_path}")
+        return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
+    except Exception as e:
+        logger.debug(f"Ошибка при открытии файла: {file_path}, {e}")
         return render(request, 'fileviewer/not_allowed.html')  # Страница с сообщением о недоступности файла
     context = {
         'content': content,
