@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import os
 
-EXCLUDE_FILES_AND_DIRS = ['config.json', '.git', 'venv']
+EXCLUDE_FILES_AND_DIRS = ['config.json', '.git', 'venv', '.gitignore', 'flower_delivery.sock']
 
 def list_files(request, path=''):
     base_dir = '/srv/flower_delivery'  # Абсолютный путь к вашему проекту
