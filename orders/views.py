@@ -10,7 +10,8 @@ def is_manager(user):
 @user_passes_test(is_manager)
 def manage_products(request):
     products = Product.objects.all()
-    return render(request, 'orders/manage_products.html', {'products': products})
+    categories = ProductCategory.objects.all()
+    return render(request, 'orders/manage_products.html', {'products': products, 'categories': categories})
 
 @login_required
 @user_passes_test(is_manager)
@@ -42,6 +43,38 @@ def edit_product(request, product_id):
 def delete_product(request, product_id):
     product = Product.objects.get(id=product_id)
     product.delete()
+    return redirect('manage_products')
+
+@login_required
+@user_passes_test(is_manager)
+def add_category(request):
+    if request.method == 'POST':
+        form = ProductCategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_products')
+    else:
+        form = ProductCategoryForm()
+    return render(request, 'orders/add_category.html', {'form': form})
+
+@login_required
+@user_passes_test(is_manager)
+def edit_category(request, category_id):
+    category = get_object_or_404(ProductCategory, id=category_id)
+    if request.method == 'POST':
+        form = ProductCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_products')
+    else:
+        form = ProductCategoryForm(instance=category)
+    return render(request, 'orders/edit_category.html', {'form': form})
+
+@login_required
+@user_passes_test(is_manager)
+def delete_category(request, category_id):
+    category = ProductCategory.objects.get(id=category_id)
+    category.delete()
     return redirect('manage_products')
 
 def product_list(request):
