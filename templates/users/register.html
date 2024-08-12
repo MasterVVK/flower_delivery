@@ -1,12 +1,55 @@
 <!-- templates/users/register.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
   <h2>Регистрация</h2>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.non_field_errors }}
+    <div class="form-group">
+      <label for="id_username">Имя пользователя:</label>
+      {% if form.username.errors %}
+        <ul class="errorlist">
+          {% for error in form.username.errors %}
+            <li class="field-error">{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {{ form.username }}
+    </div>
+    <div class="form-group">
+      <label for="id_email">Адрес электронной почты:</label>
+      {% if form.email.errors %}
+        <ul class="errorlist">
+          {% for error in form.email.errors %}
+            <li class="field-error">{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {{ form.email }}
+    </div>
+    <div class="form-group">
+      <label for="id_password1">Пароль:</label>
+      {% if form.password1.errors %}
+        <ul class="errorlist">
+          {% for error in form.password1.errors %}
+            <li class="field-error">{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {{ form.password1 }}
+    </div>
+    <div class="form-group">
+      <label for="id_password2">Подтверждение пароля:</label>
+      {% if form.password2.errors %}
+        <ul class="errorlist">
+          {% for error in form.password2.errors %}
+            <li class="field-error">{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {{ form.password2 }}
+    </div>
     <button type="submit">Зарегистрироваться</button>
   </form>
 {% endblock %}

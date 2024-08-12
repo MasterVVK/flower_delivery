@@ -83,3 +83,9 @@ form button:hover {
 .errorlist li {
     margin-left: 20px;
 }
+
+.field-error {
+    color: red;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
