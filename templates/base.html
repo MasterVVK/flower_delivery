@@ -21,6 +21,9 @@
                             <a href="#" onclick="document.getElementById('logout-form').submit();">Выйти</a>
                         </form>
                     </li>
+                    {% if user.role == 'Manager' or user.role == 'Admin' %}
+                        <li><a href="{% url 'manage_products' %}">Администрирование</a></li>
+                    {% endif %}
                 {% else %}
                     <li><a href="{% url 'login' %}">Войти</a></li>
                     <li><a href="{% url 'register' %}">Регистрация</a></li>
