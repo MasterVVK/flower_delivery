@@ -1,14 +1,20 @@
 from django.contrib import admin
-from .models import Product, Order, OrderProduct, Review, Report
+from .models import Product, ProductCategory, Order, OrderProduct, Review, Report
 
 class OrderProductInline(admin.TabularInline):
     model = OrderProduct
     extra = 1
 
+@admin.register(ProductCategory)
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'description']
+    search_fields = ['name']
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price']
+    list_display = ['name', 'price', 'category']
     search_fields = ['name']
+    list_filter = ['category']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
