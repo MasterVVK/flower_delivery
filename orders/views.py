@@ -1,7 +1,48 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Product, Order, Review
-from .forms import OrderForm, ReviewForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Product, ProductCategory
+from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
+
+def is_manager(user):
+    return user.role == 'Manager' or user.role == 'Admin'
+
+@login_required
+@user_passes_test(is_manager)
+def manage_products(request):
+    products = Product.objects.all()
+    return render(request, 'orders/manage_products.html', {'products': products})
+
+@login_required
+@user_passes_test(is_manager)
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_products')
+    else:
+        form = ProductForm()
+    return render(request, 'orders/add_product.html', {'form': form})
+
+@login_required
+@user_passes_test(is_manager)
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_products')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'orders/edit_product.html', {'form': form})
+
+@login_required
+@user_passes_test(is_manager)
+def delete_product(request, product_id):
+    product = Product.objects.get(id=product_id)
+    product.delete()
+    return redirect('manage_products')
 
 def product_list(request):
     products = Product.objects.all()
