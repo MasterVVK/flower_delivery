@@ -114,7 +114,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/srv/flower_delivery/debug.log',
+            'filename': 'debug.log',
         },
     },
     'loggers': {
