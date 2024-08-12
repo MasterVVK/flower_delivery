@@ -14,7 +14,7 @@ class CustomUserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'role'),
+            'fields': ('username', 'password1', 'password2'),
         }),
     )
 
@@ -23,6 +23,3 @@ class CustomUserAdmin(BaseUserAdmin):
     ordering = ('username',)
 
 admin.site.register(CustomUser, CustomUserAdmin)
-from django.contrib import admin
-
-# Register your models here.
