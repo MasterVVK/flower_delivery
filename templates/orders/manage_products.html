@@ -1,14 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Управление товарами</h2>
+  <h2>Управление товарами и категориями</h2>
   <a href="{% url 'add_product' %}">Добавить товар</a>
+  <a href="{% url 'add_category' %}">Добавить категорию</a>
+  <h3>Товары</h3>
   <ul>
     {% for product in products %}
       <li>
         {{ product.name }} - {{ product.price }} - {{ product.category.name }}
         <a href="{% url 'edit_product' product.id %}">Редактировать</a>
         <a href="{% url 'delete_product' product.id %}">Удалить</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <h3>Категории</h3>
+  <ul>
+    {% for category in categories %}
+      <li>
+        {{ category.name }}
+        <a href="{% url 'edit_category' category.id %}">Редактировать</a>
+        <a href="{% url 'delete_category' category.id %}">Удалить</a>
       </li>
     {% endfor %}
   </ul>
