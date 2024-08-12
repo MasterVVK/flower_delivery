@@ -27,11 +27,32 @@ main {
 nav ul {
     list-style-type: none;
     padding: 0;
+    text-align: center;
 }
 
 nav ul li {
     display: inline;
     margin: 0 10px;
+}
+
+nav ul li form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li form button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+    text-decoration: none;
+}
+
+nav ul li form button:hover {
+    text-decoration: underline;
 }
 
 form {
