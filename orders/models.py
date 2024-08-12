@@ -1,5 +1,3 @@
-# orders/models.py
-
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -19,7 +17,7 @@ class Product(models.Model):
     name = models.CharField(_("Название"), max_length=100)
     price = models.DecimalField(_("Цена"), max_digits=10, decimal_places=2)
     image = models.ImageField(_("Изображение"), upload_to='products/')
-    category = models.ForeignKey(ProductCategory, verbose_name=_("Категория"), on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey(ProductCategory, verbose_name=_("Категория"), on_delete=models.CASCADE, related_name='products', default=1)
 
     def __str__(self):
         return self.name
