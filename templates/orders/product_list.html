@@ -7,7 +7,7 @@
 {% for category in categories %}
     <h3>{{ category.name }}</h3>
     <div class="product-slider-container">
-        <button class="scroll-button left" onclick="scrollLeft('{{ category.id }}')">&lt;</button>
+        <button class="scroll-button left" onclick="window.scrollLeft('{{ category.id }}')">&lt;</button>
         <div class="product-grid" id="category-{{ category.id }}">
             {% for product in category.products.all %}
                 <div class="product-item">
@@ -21,7 +21,7 @@
                 <p>В этой категории нет товаров.</p>
             {% endfor %}
         </div>
-        <button class="scroll-button right" onclick="scrollRight('{{ category.id }}')">&gt;</button>
+        <button class="scroll-button right" onclick="window.scrollRight('{{ category.id }}')">&gt;</button>
     </div>
 {% endfor %}
 {% endblock %}
