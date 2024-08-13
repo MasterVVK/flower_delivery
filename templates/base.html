@@ -5,6 +5,48 @@
     <title>{% block title %}FlowerDelivery{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script>
+    function scrollLeft(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
+
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+
+        container.addEventListener('scroll', () => {
+            if (container.scrollLeft <= 0) {
+                container.prepend(container.lastElementChild);
+                container.scrollBy({ left: scrollAmount, behavior: 'instant' });
+            }
+        }, { once: true });
+    }
+
+    function scrollRight(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
+
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+
+        container.addEventListener('scroll', () => {
+            if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+                container.append(container.firstElementChild);
+                container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
+            }
+        }, { once: true });
+    }
+
+    window.scrollLeft = scrollLeft;
+    window.scrollRight = scrollRight;
+    </script>
 </head>
 <body>
     <header>
@@ -37,61 +79,5 @@
     <footer>
         <p>&copy; 2024 FlowerDelivery</p>
     </footer>
-    <!-- Скрипты перемещены перед закрывающим тегом body -->
-    <script>
-    function scrollLeft(categoryId) {
-        console.log('scrollLeft called for category:', categoryId); // Debug message
-        const container = document.getElementById(`category-${categoryId}`);
-        const scrollAmount = 200;
-
-        if (!container) {
-            console.error('Container not found for category:', categoryId);
-            return;
-        }
-
-        // Прокрутка влево
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-
-        // Проверка, достигли ли мы начала контейнера
-        setTimeout(() => {
-            if (container.scrollLeft <= 0) {
-                console.log('Reached the start of the container, moving last element to the beginning'); // Debug message
-                // Перемещение последнего элемента в начало
-                container.prepend(container.lastElementChild);
-                // Сброс прокрутки, чтобы избежать видимого скачка
-                container.scrollBy({ left: scrollAmount, behavior: 'instant' });
-            }
-        }, 300); // Ожидание завершения плавной прокрутки
-    }
-
-    function scrollRight(categoryId) {
-        console.log('scrollRight called for category:', categoryId); // Debug message
-        const container = document.getElementById(`category-${categoryId}`);
-        const scrollAmount = 200;
-
-        if (!container) {
-            console.error('Container not found for category:', categoryId);
-            return;
-        }
-
-        // Прокрутка вправо
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-
-        // Проверка, достигли ли мы конца контейнера
-        setTimeout(() => {
-            if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
-                console.log('Reached the end of the container, moving first element to the end'); // Debug message
-                // Перемещение первого элемента в конец
-                container.append(container.firstElementChild);
-                // Сброс прокрутки, чтобы избежать видимого скачка
-                container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
-            }
-        }, 300); // Ожидание завершения плавной прокрутки
-    }
-
-    // Убедитесь, что функции добавлены в глобальную область видимости
-    window.scrollLeft = scrollLeft;
-    window.scrollRight = scrollRight;
-    </script>
 </body>
 </html>
