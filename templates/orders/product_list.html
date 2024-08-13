@@ -6,16 +6,18 @@
 <h2>Каталог продуктов</h2>
 {% for category in categories %}
     <h3>{{ category.name }}</h3>
-    <ul>
-        {% for product in category.product_set.all %}
-            <li>
+    <div class="product-grid">
+        {% for product in category.products.all %}
+            <div class="product-item">
                 <a href="{% url 'product_detail' pk=product.pk %}">
-                    {{ product.name }}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100px; max-width: 100px;">
+                    <h4>{{ product.name }}</h4>
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
                 </a>
-                - {{ product.price }} руб.
-            </li>
+                <p>{{ product.price }} руб.</p>
+            </div>
+        {% empty %}
+            <p>В этой категории нет товаров.</p>
         {% endfor %}
-    </ul>
+    </div>
 {% endfor %}
 {% endblock %}

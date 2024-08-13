@@ -106,3 +106,35 @@ form button:hover {
     font-size: 0.9em;
     margin-bottom: 10px;
 }
+
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.product-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    width: 200px;
+    text-align: center;
+    background-color: #fff;
+}
+
+.product-item img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.product-item h3 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.product-item p {
+    font-size: 16px;
+    color: #333;
+}
