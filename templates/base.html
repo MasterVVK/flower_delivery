@@ -39,6 +39,7 @@
     </footer>
     <script>
     function scrollLeft(categoryId) {
+        console.log('scrollLeft called for category:', categoryId); // Debug message
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
 
@@ -48,6 +49,7 @@
         // Проверка, достигли ли мы начала контейнера
         setTimeout(() => {
             if (container.scrollLeft <= 0) {
+                console.log('Reached the start of the container, moving last element to the beginning'); // Debug message
                 // Перемещение последнего элемента в начало
                 container.prepend(container.lastElementChild);
                 // Сброс прокрутки, чтобы избежать видимого скачка
@@ -57,6 +59,7 @@
     }
 
     function scrollRight(categoryId) {
+        console.log('scrollRight called for category:', categoryId); // Debug message
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
 
@@ -66,6 +69,7 @@
         // Проверка, достигли ли мы конца контейнера
         setTimeout(() => {
             if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+                console.log('Reached the end of the container, moving first element to the end'); // Debug message
                 // Перемещение первого элемента в конец
                 container.append(container.firstElementChild);
                 // Сброс прокрутки, чтобы избежать видимого скачка
@@ -73,6 +77,6 @@
             }
         }, 300); // Ожидание завершения плавной прокрутки
     }
-</script>
+    </script>
 </body>
 </html>
