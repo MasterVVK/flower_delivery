@@ -37,11 +37,17 @@
     <footer>
         <p>&copy; 2024 FlowerDelivery</p>
     </footer>
+    <!-- Скрипты перемещены перед закрывающим тегом body -->
     <script>
     function scrollLeft(categoryId) {
         console.log('scrollLeft called for category:', categoryId); // Debug message
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
 
         // Прокрутка влево
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -62,6 +68,11 @@
         console.log('scrollRight called for category:', categoryId); // Debug message
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
 
         // Прокрутка вправо
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
