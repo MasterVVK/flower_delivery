@@ -88,6 +88,10 @@
             }
         }, 300); // Ожидание завершения плавной прокрутки
     }
+
+    // Убедитесь, что функции добавлены в глобальную область видимости
+    window.scrollLeft = scrollLeft;
+    window.scrollRight = scrollRight;
     </script>
 </body>
 </html>
