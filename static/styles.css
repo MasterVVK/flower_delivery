@@ -111,13 +111,14 @@ form button:hover {
     position: relative;
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 
 .product-grid {
     display: flex;
     flex-wrap: nowrap;
     gap: 20px;
-    overflow: hidden;
+    overflow: hidden; /* Убрана горизонтальная прокрутка */
     scroll-behavior: smooth;
     flex: 1;
 }
@@ -158,7 +159,9 @@ form button:hover {
     cursor: pointer;
     font-size: 18px;
     position: absolute;
-    z-index: 1;
+    z-index: 2; /* Увеличено значение */
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .scroll-button.left {
@@ -167,10 +170,6 @@ form button:hover {
 
 .scroll-button.right {
     right: 0;
-}
-
-.scroll-button.left, .scroll-button.right {
-    display: none;
 }
 
 .product-slider-container:hover .scroll-button.left,

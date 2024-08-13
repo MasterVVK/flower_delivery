@@ -45,7 +45,7 @@
             container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
 
             // Check if we reached the beginning
-            if (container.scrollLeft === 0) {
+            if (container.scrollLeft <= 0) {
                 // Move the last item to the beginning
                 container.prepend(container.lastElementChild);
                 container.scrollBy({ left: scrollAmount, behavior: 'instant' });
