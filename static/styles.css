@@ -168,3 +168,12 @@ form button:hover {
 .scroll-button.right {
     right: 0;
 }
+
+.scroll-button.left, .scroll-button.right {
+    display: none;
+}
+
+.product-slider-container:hover .scroll-button.left,
+.product-slider-container:hover .scroll-button.right {
+    display: block;
+}

@@ -1,6 +1,8 @@
+# views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Product, ProductCategory, Order, Review  # Убедитесь, что здесь добавлен Review
+from .models import Product, ProductCategory, Order, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
 
 def is_manager(user):
@@ -83,7 +85,7 @@ def product_list(request):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    reviews = Review.objects.filter(product=product)  # Здесь используется Review
+    reviews = Review.objects.filter(product=product)
     return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
 
 @login_required

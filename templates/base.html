@@ -40,25 +40,29 @@
     <script>
         function scrollLeft(categoryId) {
             const container = document.getElementById(`category-${categoryId}`);
-            container.scrollBy({ left: -200, behavior: 'smooth' });
+            const scrollAmount = 200;
+
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
 
             // Check if we reached the beginning
             if (container.scrollLeft === 0) {
                 // Move the last item to the beginning
                 container.prepend(container.lastElementChild);
-                container.scrollBy({ left: 200, behavior: 'instant' });
+                container.scrollBy({ left: scrollAmount, behavior: 'instant' });
             }
         }
 
         function scrollRight(categoryId) {
             const container = document.getElementById(`category-${categoryId}`);
-            container.scrollBy({ left: 200, behavior: 'smooth' });
+            const scrollAmount = 200;
+
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 
             // Check if we reached the end
             if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
                 // Move the first item to the end
                 container.append(container.firstElementChild);
-                container.scrollBy({ left: -200, behavior: 'instant' });
+                container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
             }
         }
     </script>
