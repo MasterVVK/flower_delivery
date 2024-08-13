@@ -37,34 +37,43 @@
     <footer>
         <p>&copy; 2024 FlowerDelivery</p>
     </footer>
-    <script>
-        function scrollLeft(categoryId) {
-            const container = document.getElementById(`category-${categoryId}`);
-            const scrollAmount = 200;
+   <script>
+    function scrollLeft(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
 
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        // Прокрутка влево
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
 
-            // Check if we reached the beginning
+        // Проверка, достигли ли мы начала контейнера
+        setTimeout(() => {
             if (container.scrollLeft <= 0) {
-                // Move the last item to the beginning
+                // Перемещение последнего элемента в начало
                 container.prepend(container.lastElementChild);
+                // Сброс прокрутки, чтобы избежать видимого скачка
                 container.scrollBy({ left: scrollAmount, behavior: 'instant' });
             }
-        }
+        }, 300); // Ожидание завершения плавной прокрутки
+    }
 
-        function scrollRight(categoryId) {
-            const container = document.getElementById(`category-${categoryId}`);
-            const scrollAmount = 200;
+    function scrollRight(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
 
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        // Прокрутка вправо
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 
-            // Check if we reached the end
+        // Проверка, достигли ли мы конца контейнера
+        setTimeout(() => {
             if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
-                // Move the first item to the end
+                // Перемещение первого элемента в конец
                 container.append(container.firstElementChild);
+                // Сброс прокрутки, чтобы избежать видимого скачка
                 container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
             }
-        }
-    </script>
+        }, 300); // Ожидание завершения плавной прокрутки
+    }
+</script>
+
 </body>
 </html>
