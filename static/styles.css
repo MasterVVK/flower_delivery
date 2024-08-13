@@ -107,7 +107,7 @@ form button:hover {
     margin-bottom: 10px;
 }
 
-.product-list {
+.product-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -118,18 +118,20 @@ form button:hover {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
-    width: 200px;
+    width: 200px; /* Максимальная ширина контейнера */
     text-align: center;
     background-color: #fff;
+    box-sizing: border-box; /* Учитывать padding и border в ширине и высоте */
 }
 
 .product-item img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100%; /* Ограничение ширины изображения */
+    max-height: 200px; /* Ограничение высоты изображения */
+    height: auto; /* Сохранять пропорции изображения */
     margin-bottom: 10px;
 }
 
-.product-item h3 {
+.product-item h4 {
     font-size: 18px;
     margin: 10px 0;
 }
