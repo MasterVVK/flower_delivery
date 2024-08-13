@@ -4,15 +4,18 @@
 
 {% block content %}
 <h2>Каталог продуктов</h2>
-<ul>
-    {% for product in products %}
-        <li>
-            <a href="{% url 'product_detail' pk=product.pk %}">
-                {{ product.name }}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100px; max-width: 100px;">
-            </a>
-            - {{ product.price }} руб.
-        </li>
-    {% endfor %}
-</ul>
+{% for category in categories %}
+    <h3>{{ category.name }}</h3>
+    <ul>
+        {% for product in category.product_set.all %}
+            <li>
+                <a href="{% url 'product_detail' pk=product.pk %}">
+                    {{ product.name }}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100px; max-width: 100px;">
+                </a>
+                - {{ product.price }} руб.
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
 {% endblock %}

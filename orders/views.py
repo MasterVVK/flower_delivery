@@ -78,8 +78,8 @@ def delete_category(request, category_id):
     return redirect('manage_products')
 
 def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'orders/product_list.html', {'products': products})
+    categories = ProductCategory.objects.all()
+    return render(request, 'orders/product_list.html', {'categories': categories})
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
