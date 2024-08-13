@@ -6,18 +6,22 @@
 <h2>Каталог продуктов</h2>
 {% for category in categories %}
     <h3>{{ category.name }}</h3>
-    <div class="product-grid">
-        {% for product in category.products.all %}
-            <div class="product-item">
-                <a href="{% url 'product_detail' pk=product.pk %}">
-                    <h4>{{ product.name }}</h4>
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                </a>
-                <p>{{ product.price }} руб.</p>
-            </div>
-        {% empty %}
-            <p>В этой категории нет товаров.</p>
-        {% endfor %}
+    <div class="product-slider-container">
+        <button class="scroll-button left" onclick="scrollLeft('{{ category.id }}')">&lt;</button>
+        <div class="product-grid" id="category-{{ category.id }}">
+            {% for product in category.products.all %}
+                <div class="product-item">
+                    <a href="{% url 'product_detail' pk=product.pk %}">
+                        <h4>{{ product.name }}</h4>
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    </a>
+                    <p>{{ product.price }} руб.</p>
+                </div>
+            {% empty %}
+                <p>В этой категории нет товаров.</p>
+            {% endfor %}
+        </div>
+        <button class="scroll-button right" onclick="scrollRight('{{ category.id }}')">&gt;</button>
     </div>
 {% endfor %}
 {% endblock %}
