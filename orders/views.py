@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Product, ProductCategory
+from .models import Product, ProductCategory, Order, Review  # Убедитесь, что здесь добавлен Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
 
 def is_manager(user):
@@ -78,12 +78,12 @@ def delete_category(request, category_id):
     return redirect('manage_products')
 
 def product_list(request):
-    categories = ProductCategory.objects.all()
+    categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/product_list.html', {'categories': categories})
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    reviews = Review.objects.filter(product=product)
+    reviews = Review.objects.filter(product=product)  # Здесь используется Review
     return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
 
 @login_required
