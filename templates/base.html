@@ -43,13 +43,24 @@
 function scrollLeft(categoryId) {
     const container = document.getElementById(`category-${categoryId}`);
     container.scrollBy({ left: -200, behavior: 'smooth' });
+
+    // Если достигли начала, прокрутка к концу
+    if (container.scrollLeft <= 0) {
+        container.scrollLeft = container.scrollWidth;
+    }
 }
 
 function scrollRight(categoryId) {
     const container = document.getElementById(`category-${categoryId}`);
     container.scrollBy({ left: 200, behavior: 'smooth' });
+
+    // Если достигли конца, прокрутка к началу
+    if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+        container.scrollLeft = 0;
+    }
 }
 </script>
+
 
 
 </html>
