@@ -5,7 +5,7 @@
 {% block content %}
 <h2>{{ product.name }}</h2>
 <p>Цена: {{ product.price }} руб.</p>
-<img src="{{ product.image.url }}" alt="{{ product.name }}">
+<img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 400px; max-width: 400px;">
 <h3>Отзывы</h3>
 <ul>
     {% for review in reviews %}

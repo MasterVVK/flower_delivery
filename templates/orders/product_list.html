@@ -7,7 +7,11 @@
 <ul>
     {% for product in products %}
         <li>
-            <a href="{% url 'product_detail' pk=product.pk %}">{{ product.name }}</a> - {{ product.price }} руб.
+            <a href="{% url 'product_detail' pk=product.pk %}">
+                {{ product.name }}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100px; max-width: 100px;">
+            </a>
+            - {{ product.price }} руб.
         </li>
     {% endfor %}
 </ul>
