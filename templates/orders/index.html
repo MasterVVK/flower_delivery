@@ -17,15 +17,20 @@
             </div>
         {% endfor %}
     </div>
-    <div id="load-more" style="text-align: center; margin-top: 20px;">
-        <button onclick="loadMoreProducts()">Загрузить больше</button>
+    <div id="loading" style="text-align: center; margin-top: 20px; display: none;">
+        <p>Загрузка...</p>
     </div>
 </div>
 
 <script>
     let page = 2;
+    let isLoading = false;
 
     function loadMoreProducts() {
+        if (isLoading) return;
+        isLoading = true;
+        document.getElementById('loading').style.display = 'block';
+        
         fetch(`/api/products/?page=${page}`)
             .then(response => response.json())
             .then(data => {
@@ -43,7 +48,23 @@
                     productList.appendChild(productItem);
                 });
                 page++;
+                isLoading = false;
+                document.getElementById('loading').style.display = 'none';
+                if (!data.has_next) {
+                    window.removeEventListener('scroll', handleScroll);
+                }
             });
     }
+
+    function handleScroll() {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY;
+
+        if (scrolled >= scrollable - 200) {
+            loadMoreProducts();
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll);
 </script>
 {% endblock %}
