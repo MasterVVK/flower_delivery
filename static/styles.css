@@ -163,20 +163,20 @@ form button:hover {
 }
 
 .scroll-button.left {
-    left: 10px; /* Обеспечивает видимость кнопок */
+    left: 0; /* Максимально левое расположение */
 }
 
 .scroll-button.right {
-    right: 10px; /* Обеспечивает видимость кнопок */
+    right: 0; /* Максимально правое расположение */
 }
 
 .icon {
     width: 36px; /* Увеличенный размер иконок */
     height: 36px; /* Увеличенный размер иконок */
-    filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(1) contrast(1); /* Начальный цвет (черный) */
+    filter: invert(80%) sepia(8%) saturate(9%) hue-rotate(190deg) brightness(96%) contrast(89%); /* Светло-серый цвет по умолчанию */
     transition: filter 0.3s ease;
 }
 
 .scroll-button:hover .icon {
-    filter: invert(37%) sepia(80%) saturate(6730%) hue-rotate(0deg) brightness(99%) contrast(108%); /* Цвет при наведении (синий) */
+    filter: invert(34%) sepia(99%) saturate(7499%) hue-rotate(189deg) brightness(97%) contrast(102%); /* Синий цвет при наведении */
 }
