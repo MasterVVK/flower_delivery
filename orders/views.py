@@ -1,4 +1,4 @@
-# views.py
+# orders/views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -22,13 +22,14 @@ def load_more_products(request):
     products = paginator.get_page(page)
     # Формируем список товаров в формате JSON
     products_list = [{
+        'id': product.id,  # Добавлен идентификатор продукта
         'name': product.name,
         'price': product.price,
         'image': product.image.url,
         'url': reverse('product_detail', args=[product.pk])
     } for product in products]
     # Возвращаем JSON-ответ
-    return JsonResponse({'products': products_list})
+    return JsonResponse({'products': products_list, 'has_next': products.has_next()})
 
 def is_manager(user):
     return user.role == 'Manager' or user.role == 'Admin'
