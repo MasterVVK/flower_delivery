@@ -110,15 +110,22 @@ form button:hover {
 }
 
 /* Стили для главной страницы */
+#main-page #product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between; /* Для равномерного распределения товаров */
+}
+
 #main-page .product-item {
+    flex: 1 1 calc(25% - 20px); /* Четыре товара в ряд */
+    max-width: calc(25% - 20px); /* Четыре товара в ряд */
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
-    width: 200px;
-    text-align: center;
     background-color: #fff;
     box-sizing: border-box;
-    flex-shrink: 0;
+    text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -220,10 +227,10 @@ form button:hover {
 .icon {
     width: 36px;
     height: 36px;
-    filter: grayscale(100%) brightness(80%);
+    filter: invert(80%) sepia(8%) saturate(9%) hue-rotate(190deg) brightness(96%) contrast(89%); /* Светло-серый цвет по умолчанию */
     transition: filter 0.3s ease;
 }
 
 .scroll-button:hover .icon {
-    filter: none;
+    filter: invert(34%) sepia(99%) saturate(7499%) hue-rotate(189deg) brightness(97%) contrast(102%); /* Синий цвет при наведении */
 }
