@@ -15,6 +15,11 @@
             return;
         }
 
+        if (container.scrollLeft === 0) {
+            container.prepend(container.lastElementChild);
+            container.scrollBy({ left: scrollAmount, behavior: 'instant' });
+        }
+
         const onScroll = () => {
             if (container.scrollLeft <= 0) {
                 container.prepend(container.lastElementChild);
