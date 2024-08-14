@@ -160,18 +160,6 @@ form button:hover {
     z-index: 2; /* Увеличено значение */
     top: 50%;
     transform: translateY(-50%);
-    transition: color 0.3s ease, background-color 0.3s ease; /* Плавный переход для эффекта наведения */
-    color: red; /* Красный цвет по умолчанию */
-}
-
-.scroll-button:hover {
-    color: blue; /* Синий цвет при наведении */
-}
-
-.scroll-button img {
-    width: 36px; /* Увеличенный размер иконок */
-    height: 36px; /* Увеличенный размер иконок */
-    fill: currentColor; /* Установка цвета через свойство color */
 }
 
 .scroll-button.left {
@@ -180,4 +168,15 @@ form button:hover {
 
 .scroll-button.right {
     right: 10px; /* Обеспечивает видимость кнопок */
+}
+
+.icon {
+    width: 36px; /* Увеличенный размер иконок */
+    height: 36px; /* Увеличенный размер иконок */
+    filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(1) contrast(1); /* Начальный цвет (черный) */
+    transition: filter 0.3s ease;
+}
+
+.scroll-button:hover .icon {
+    filter: invert(37%) sepia(80%) saturate(6730%) hue-rotate(0deg) brightness(99%) contrast(108%); /* Цвет при наведении (синий) */
 }

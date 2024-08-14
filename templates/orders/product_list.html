@@ -9,7 +9,7 @@
     <h3>{{ category.name }}</h3>
     <div class="product-slider-container">
         <button class="scroll-button left" onclick="window.scrollLeft('{{ category.id }}')">
-            <img src="{% static 'icons/left-arrow.svg' %}" alt="Scroll Left">
+            <img src="{% static 'icons/left-arrow.svg' %}" alt="Scroll Left" class="icon">
         </button>
         <div class="product-grid" id="category-{{ category.id }}">
             {% for product in category.products.all %}
@@ -25,7 +25,7 @@
             {% endfor %}
         </div>
         <button class="scroll-button right" onclick="window.scrollRight('{{ category.id }}')">
-            <img src="{% static 'icons/right-arrow.svg' %}" alt="Scroll Right">
+            <img src="{% static 'icons/right-arrow.svg' %}" alt="Scroll Right" class="icon">
         </button>
     </div>
 {% endfor %}
