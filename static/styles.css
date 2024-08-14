@@ -152,26 +152,31 @@ form button:hover {
 }
 
 .scroll-button {
-    background-color: #007bff;
+    background-color: transparent; /* Прозрачный фон */
     border: none;
-    color: white;
-    padding: 10px;
+    color: #007bff; /* Синий цвет текста */
+    padding: 20px; /* Увеличенное поле */
     cursor: pointer;
-    font-size: 18px;
+    font-size: 24px; /* Увеличенный размер текста */
     position: absolute;
     z-index: 2; /* Увеличено значение */
     top: 50%;
     transform: translateY(-50%);
+    transition: color 0.3s ease, background-color 0.3s ease; /* Плавный переход для эффекта наведения */
+}
+
+.scroll-button:hover {
+    color: #0056b3; /* Темно-синий цвет текста при наведении */
+    background-color: rgba(0, 123, 255, 0.1); /* Полупрозрачный синий цвет при наведении */
 }
 
 .scroll-button.left {
-    left: 0;
+    left: 0; /* Обеспечивает видимость кнопок */
 }
 
 .scroll-button.right {
-    right: 0;
+    right: 0; /* Обеспечивает видимость кнопок */
 }
-
 .product-slider-container:hover .scroll-button.left,
 .product-slider-container:hover .scroll-button.right {
     display: block;
