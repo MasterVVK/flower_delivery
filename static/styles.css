@@ -118,7 +118,7 @@ form button:hover {
     display: flex;
     flex-wrap: nowrap;
     gap: 20px;
-    overflow: hidden; /* Убрана горизонтальная прокрутка */
+    overflow: hidden;
     scroll-behavior: smooth;
     flex: 1;
 }
@@ -154,30 +154,28 @@ form button:hover {
 .scroll-button {
     background-color: transparent; /* Прозрачный фон */
     border: none;
-    color: #007bff; /* Синий цвет текста */
     padding: 20px; /* Увеличенное поле */
     cursor: pointer;
-    font-size: 24px; /* Увеличенный размер текста */
     position: absolute;
     z-index: 2; /* Увеличено значение */
     top: 50%;
     transform: translateY(-50%);
-    transition: color 0.3s ease, background-color 0.3s ease; /* Плавный переход для эффекта наведения */
+    transition: background-color 0.3s ease; /* Плавный переход для эффекта наведения */
 }
 
 .scroll-button:hover {
-    color: #0056b3; /* Темно-синий цвет текста при наведении */
     background-color: rgba(0, 123, 255, 0.1); /* Полупрозрачный синий цвет при наведении */
 }
 
+.scroll-button img {
+    width: 24px; /* Размер иконок */
+    height: 24px; /* Размер иконок */
+}
+
 .scroll-button.left {
-    left: 0; /* Обеспечивает видимость кнопок */
+    left: 10px; /* Обеспечивает видимость кнопок */
 }
 
 .scroll-button.right {
-    right: 0; /* Обеспечивает видимость кнопок */
-}
-.product-slider-container:hover .scroll-button.left,
-.product-slider-container:hover .scroll-button.right {
-    display: block;
+    right: 10px; /* Обеспечивает видимость кнопок */
 }
