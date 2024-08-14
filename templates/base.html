@@ -15,15 +15,16 @@
             return;
         }
 
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-
-        container.addEventListener('scroll', function onScroll() {
+        const onScroll = () => {
             if (container.scrollLeft <= 0) {
                 container.prepend(container.lastElementChild);
                 container.scrollBy({ left: scrollAmount, behavior: 'instant' });
                 container.removeEventListener('scroll', onScroll);
             }
-        });
+        };
+
+        container.addEventListener('scroll', onScroll);
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
 
     function scrollRight(categoryId) {
@@ -35,15 +36,16 @@
             return;
         }
 
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-
-        container.addEventListener('scroll', function onScroll() {
+        const onScroll = () => {
             if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
                 container.append(container.firstElementChild);
                 container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
                 container.removeEventListener('scroll', onScroll);
             }
-        });
+        };
+
+        container.addEventListener('scroll', onScroll);
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
 
     window.scrollLeft = scrollLeft;
