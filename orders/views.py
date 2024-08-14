@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Product, ProductCategory, Order, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
+from django.urls import reverse  # Добавьте этот импорт
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 
