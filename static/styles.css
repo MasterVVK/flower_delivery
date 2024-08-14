@@ -161,6 +161,20 @@ form button:hover {
     text-align: center;
 }
 
+/* Стили для сетки товаров на главной странице */
+#product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between; /* Для равномерного распределения товаров */
+}
+
+.product-item {
+    flex: 1 1 calc(25% - 20px); /* Четыре товара в ряд */
+    max-width: calc(25% - 20px); /* Четыре товара в ряд */
+    box-sizing: border-box;
+}
+
 .product-price {
     font-size: 16px;
     color: #007bff;
