@@ -161,11 +161,11 @@ form button:hover {
     top: 50%;
     transform: translateY(-50%);
     transition: color 0.3s ease, background-color 0.3s ease; /* Плавный переход для эффекта наведения */
-    color: #aaa; /* Серый цвет по умолчанию */
+    color: red; /* Красный цвет по умолчанию */
 }
 
 .scroll-button:hover {
-    color: #007bff; /* Синий цвет при наведении */
+    color: blue; /* Синий цвет при наведении */
 }
 
 .scroll-button img {
