@@ -151,6 +151,23 @@ form button:hover {
     color: #333;
 }
 
+.product-name {
+    font-size: 18px;
+    margin: 10px 0;
+    height: 3em; /* Фиксированная высота для заголовков товаров */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.product-price {
+    font-size: 16px;
+    color: #007bff;
+    margin-top: auto;
+}
+
+
 .scroll-button {
     background-color: transparent; /* Прозрачный фон */
     border: none;
