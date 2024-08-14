@@ -56,10 +56,11 @@
 </head>
 <body>
     <header>
-        <h1><a href="{% url 'product_list' %}">FlowerDelivery</a></h1>
+        <h1><a href="{% url 'index' %}">FlowerDelivery</a></h1>
         <nav>
             <ul>
-                <li><a href="{% url 'product_list' %}">Главная</a></li>
+                <li><a href="{% url 'index' %}">Главная</a></li>
+                <li><a href="{% url 'categories' %}">Категории</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'profile' %}">Профиль</a></li>
                     <li>

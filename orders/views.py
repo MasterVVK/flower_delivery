@@ -4,6 +4,30 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Product, ProductCategory, Order, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+
+def index(request):
+    # Получаем первые 20 товаров для начального отображения
+    products = Product.objects.all()[:20]
+    return render(request, 'orders/index.html', {'products': products})
+
+def load_more_products(request):
+    # Получаем номер страницы из GET-запроса
+    page = request.GET.get('page', 1)
+    # Создаем пагинатор с шагом 20 товаров на страницу
+    paginator = Paginator(Product.objects.all(), 20)
+    # Получаем товары для указанной страницы
+    products = paginator.get_page(page)
+    # Формируем список товаров в формате JSON
+    products_list = [{
+        'name': product.name,
+        'price': product.price,
+        'image': product.image.url,
+        'url': reverse('product_detail', args=[product.pk])
+    } for product in products]
+    # Возвращаем JSON-ответ
+    return JsonResponse({'products': products_list})
 
 def is_manager(user):
     return user.role == 'Manager' or user.role == 'Admin'
@@ -122,3 +146,7 @@ def add_review(request, product_id):
     else:
         form = ReviewForm()
     return render(request, 'orders/review_form.html', {'form': form, 'product': product})
+
+def categories(request):
+    categories = ProductCategory.objects.all().prefetch_related('products')
+    return render(request, 'orders/categories.html', {'categories': categories})

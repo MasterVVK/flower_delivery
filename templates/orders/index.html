@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Все товары</h2>
+<div id="product-list">
+    {% for product in products %}
+        <div class="product-item">
+            <a href="{% url 'product_detail' pk=product.pk %}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                <h4 class="product-name">{{ product.name }}</h4>
+                <p class="product-price">{{ product.price }} руб.</p>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+<div id="load-more" style="text-align: center; margin-top: 20px;">
+    <button onclick="loadMoreProducts()">Загрузить больше</button>
+</div>
+
+<script>
+    let page = 2;
+
+    function loadMoreProducts() {
+        fetch(`/api/products/?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                const productList = document.getElementById('product-list');
+                data.products.forEach(product => {
+                    const productItem = document.createElement('div');
+                    productItem.classList.add('product-item');
+                    productItem.innerHTML = `
+                        <a href="${product.url}">
+                            <img src="${product.image}" alt="${product.name}" class="product-image">
+                            <h4 class="product-name">${product.name}</h4>
+                            <p class="product-price">${product.price} руб.</p>
+                        </a>
+                    `;
+                    productList.appendChild(productItem);
+                });
+                page++;
+            });
+    }
+</script>
+{% endblock %}
