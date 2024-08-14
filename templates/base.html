@@ -6,7 +6,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <script>
-    function scrollLeft(categoryId) {
+    window.scrollLeft = function scrollLeft(categoryId) {
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
 
@@ -25,9 +25,9 @@
 
         container.addEventListener('scroll', onScroll);
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    }
+    };
 
-    function scrollRight(categoryId) {
+    window.scrollRight = function scrollRight(categoryId) {
         const container = document.getElementById(`category-${categoryId}`);
         const scrollAmount = 200;
 
@@ -46,10 +46,7 @@
 
         container.addEventListener('scroll', onScroll);
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-
-    window.scrollLeft = scrollLeft;
-    window.scrollRight = scrollRight;
+    };
     </script>
 </head>
 <body>
