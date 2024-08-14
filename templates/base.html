@@ -17,12 +17,13 @@
 
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
 
-        container.addEventListener('scroll', () => {
+        container.addEventListener('scroll', function onScroll() {
             if (container.scrollLeft <= 0) {
                 container.prepend(container.lastElementChild);
                 container.scrollBy({ left: scrollAmount, behavior: 'instant' });
+                container.removeEventListener('scroll', onScroll);
             }
-        }, { once: true });
+        });
     }
 
     function scrollRight(categoryId) {
@@ -36,12 +37,13 @@
 
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 
-        container.addEventListener('scroll', () => {
+        container.addEventListener('scroll', function onScroll() {
             if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
                 container.append(container.firstElementChild);
                 container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
+                container.removeEventListener('scroll', onScroll);
             }
-        }, { once: true });
+        });
     }
 
     window.scrollLeft = scrollLeft;
