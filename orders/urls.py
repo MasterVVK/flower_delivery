@@ -20,4 +20,5 @@ urlpatterns = [
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('checkout/', views.checkout, name='checkout'),  # Добавлен маршрут для оформления заказа
+    path('test_filter/', views.test_filter, name='test_filter'),
  ]

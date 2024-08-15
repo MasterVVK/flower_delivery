@@ -6,6 +6,12 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.shortcuts import render
+
+# Другие импорты и функции...
+
+def test_filter(request):
+    return render(request, 'orders/test_filter.html')
 
 
 def get_cart(request):
