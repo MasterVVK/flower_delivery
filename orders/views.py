@@ -8,16 +8,34 @@ from django.http import JsonResponse
 from .bot_utils import notify_new_order
 from django.contrib import messages
 
+
 def get_cart(request):
     if request.user.is_authenticated:
         cart, created = Cart.objects.get_or_create(user=request.user)
+
+        # Если есть сессионная корзина, объединим её с корзиной пользователя
+        session_key = request.session.session_key
+        if session_key:
+            try:
+                guest_cart = Cart.objects.get(session_key=session_key)
+                if guest_cart and guest_cart.items.exists():
+                    for item in guest_cart.items.all():
+                        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+                        if not created:
+                            cart_item.quantity += item.quantity
+                        cart_item.save()
+                    guest_cart.delete()  # Удаляем корзину гостя после объединения
+            except Cart.DoesNotExist:
+                pass
     else:
         session_key = request.session.session_key
         if not session_key:
             request.session.create()
             session_key = request.session.session_key
         cart, created = Cart.objects.get_or_create(session_key=session_key)
+
     return cart
+
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
