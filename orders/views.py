@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .bot_utils import notify_new_order
+from django.contrib import messages
 
 def get_cart(request):
     if request.user.is_authenticated:
@@ -39,8 +40,9 @@ def remove_from_cart(request, product_id):
     cart_item.delete()
     return redirect('cart_detail')
 
-@login_required  # Декоратор для проверки авторизации
+@login_required
 def checkout(request):
+    messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
     cart = get_cart(request)
     cart_items = cart.items.all()
 
