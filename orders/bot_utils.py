@@ -1,8 +1,7 @@
 import json
 import os
 import logging
-from aiogram import Bot
-from asgiref.sync import sync_to_async
+from aiogram import Bot, Dispatcher, types
 from django.conf import settings
 
 # Загрузка конфигурации
@@ -19,10 +18,11 @@ CHAT_ID = config['chat_id']
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
+dp = Dispatcher(bot)
 
-async def notify_new_order(order):
-    message = await sync_to_async(construct_order_message)(order)
-    await bot.send_message(chat_id=CHAT_ID, text=message)
+def notify_new_order(order):
+    message = construct_order_message(order)
+    send_message_to_telegram(message)
 
 def construct_order_message(order):
     message = f"Новый заказ №{order.id}\nПользователь: {order.user.username}\nСтатус: {order.get_status_display()}\n"
@@ -34,3 +34,6 @@ def construct_order_message(order):
     else:
         message += "Нет продуктов в заказе.\n"
     return message
+
+def send_message_to_telegram(message):
+    bot.loop.run_until_complete(bot.send_message(chat_id=CHAT_ID, text=message))
