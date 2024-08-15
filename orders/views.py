@@ -1,4 +1,3 @@
-import asyncio
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, ProductCategory, Cart, CartItem, Order, OrderProduct, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
@@ -47,11 +46,9 @@ def checkout(request):
     cart_items = cart.items.all()
 
     if request.method == 'POST':
-        # Используем async_to_sync для выполнения синхронных операций
-        order = async_to_sync(Order.objects.create)(user=request.user)
-        for item in cart_items:
-            async_to_sync(OrderProduct.objects.create)(order=order, product=item.product, quantity=item.quantity)
-        async_to_sync(cart.items.all().delete)()
+        order = async_to_sync(sync_create_order)(request.user)
+        async_to_sync(sync_create_order_products)(order, cart_items)
+        async_to_sync(sync_clear_cart)(cart)
         return redirect('order_detail', pk=order.pk)
 
     return render(request, 'orders/checkout.html', {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
@@ -60,6 +57,19 @@ def checkout(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     return render(request, 'orders/order_detail.html', {'order': order})
+
+@sync_to_async
+def sync_create_order(user):
+    return Order.objects.create(user=user)
+
+@sync_to_async
+def sync_create_order_products(order, cart_items):
+    for item in cart_items:
+        OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
+
+@sync_to_async
+def sync_clear_cart(cart):
+    cart.items.all().delete()
 
 # Другие функции...
 
