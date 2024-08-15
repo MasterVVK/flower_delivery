@@ -3,10 +3,11 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 class Cart(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, blank=True, null=True)
 
     def __str__(self):
-        return f"Корзина {self.user.username}"
+        return f"Корзина {self.user.username if self.user else self.session_key}"
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -15,7 +16,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
-
 
 class ProductCategory(models.Model):
     name = models.CharField(_("Название категории"), max_length=100)

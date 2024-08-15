@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}Корзина{% endblock %}
 
@@ -14,11 +15,11 @@
         </tr>
     </thead>
     <tbody>
-        {% for item in cart.items.all %}
+        {% for item in cart_items %}
         <tr>
             <td>{{ item.product.name }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.product.price }} руб.</td>
+            <td>{{ item.quantity|multiply:item.product.price }} руб.</td>
             <td>
                 <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
                     {% csrf_token %}
@@ -29,6 +30,6 @@
         {% endfor %}
     </tbody>
 </table>
-<p>Общая сумма: {{ cart.items.all|sum:"product.price" }} руб.</p>
-<a href="{% url 'order_create' %}">Оформить заказ</a>
+<p>Общая сумма: {{ total }} руб.</p>
+<a href="{% url 'checkout' %}">Оформить заказ</a>
 {% endblock %}

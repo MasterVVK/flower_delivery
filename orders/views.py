@@ -1,62 +1,94 @@
-# orders/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Product, ProductCategory, Order, Review, Cart, CartItem
+from .models import Product, ProductCategory, Cart, CartItem, Order, OrderProduct, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.contrib.auth.models import User
 
 
-@login_required
+def get_cart(request):
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+    else:
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+        cart, created = Cart.objects.get_or_create(session_key=session_key)
+    return cart
+
+
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart = get_cart(request)
+
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
     if not created:
         cart_item.quantity += 1
     cart_item.save()
+
     return redirect('cart_detail')
 
-@login_required
-def cart_detail(request):
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    return render(request, 'orders/cart_detail.html', {'cart': cart})
 
-@login_required
+def cart_detail(request):
+    cart = get_cart(request)
+    cart_items = cart.items.all()
+    total = sum(item.quantity * item.product.price for item in cart_items)
+
+    return render(request, 'orders/cart_detail.html', {'cart_items': cart_items, 'total': total})
+
+
 def remove_from_cart(request, product_id):
-    cart = get_object_or_404(Cart, user=request.user)
+    cart = get_cart(request)
     cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
     cart_item.delete()
+
     return redirect('cart_detail')
+
+
+@login_required
+def checkout(request):
+    cart = get_cart(request)
+    cart_items = cart.items.all()
+
+    if request.method == 'POST':
+        order = Order.objects.create(user=request.user)
+        for item in cart_items:
+            OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
+        cart.items.all().delete()
+
+        return redirect('order_detail', pk=order.pk)
+
+    return render(request, 'orders/checkout.html',
+                  {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
 
 
 def index(request):
-    # Получаем первые 20 товаров для начального отображения
     products = Product.objects.all()[:20]
     return render(request, 'orders/index.html', {'products': products})
 
+
 def load_more_products(request):
-    # Получаем номер страницы из GET-запроса
     page = request.GET.get('page', 1)
-    # Создаем пагинатор с шагом 20 товаров на страницу
     paginator = Paginator(Product.objects.all(), 20)
-    # Получаем товары для указанной страницы
     products = paginator.get_page(page)
-    # Формируем список товаров в формате JSON
+
     products_list = [{
-        'id': product.id,  # Добавлен идентификатор продукта
+        'id': product.id,
         'name': product.name,
         'price': product.price,
         'image': product.image.url,
         'url': reverse('product_detail', args=[product.pk])
     } for product in products]
-    # Возвращаем JSON-ответ
+
     return JsonResponse({'products': products_list, 'has_next': products.has_next()})
+
 
 def is_manager(user):
     return user.role == 'Manager' or user.role == 'Admin'
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -64,6 +96,7 @@ def manage_products(request):
     products = Product.objects.all()
     categories = ProductCategory.objects.all()
     return render(request, 'orders/manage_products.html', {'products': products, 'categories': categories})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -76,6 +109,7 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'orders/add_product.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -90,12 +124,14 @@ def edit_product(request, product_id):
         form = ProductForm(instance=product)
     return render(request, 'orders/edit_product.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_manager)
 def delete_product(request, product_id):
     product = Product.objects.get(id=product_id)
     product.delete()
     return redirect('manage_products')
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -108,6 +144,7 @@ def add_category(request):
     else:
         form = ProductCategoryForm()
     return render(request, 'orders/add_category.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -122,6 +159,7 @@ def edit_category(request, category_id):
         form = ProductCategoryForm(instance=category)
     return render(request, 'orders/edit_category.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_manager)
 def delete_category(request, category_id):
@@ -129,34 +167,33 @@ def delete_category(request, category_id):
     category.delete()
     return redirect('manage_products')
 
+
 def product_list(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/product_list.html', {'categories': categories})
+
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     reviews = Review.objects.filter(product=product)
     return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
 
+
 @login_required
 def order_create(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.save()
-            order.products.add(product)
-            return redirect('order_detail', pk=order.pk)
-    else:
-        form = OrderForm()
-    return render(request, 'orders/order_form.html', {'form': form, 'product': product})
+        order = Order.objects.create(user=request.user)
+        OrderProduct.objects.create(order=order, product=product, quantity=1)
+        return redirect('order_detail', pk=order.pk)
+    return render(request, 'orders/order_form.html', {'product': product})
+
 
 @login_required
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     return render(request, 'orders/order_detail.html', {'order': order})
+
 
 @login_required
 def add_review(request, product_id):
@@ -172,6 +209,7 @@ def add_review(request, product_id):
     else:
         form = ReviewForm()
     return render(request, 'orders/review_form.html', {'form': form, 'product': product})
+
 
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
