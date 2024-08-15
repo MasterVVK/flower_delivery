@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from asgiref.sync import sync_to_async
 
 def get_cart(request):
     if request.user.is_authenticated:
@@ -58,6 +59,8 @@ def checkout(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     return render(request, 'orders/order_detail.html', {'order': order})
+
+# Другие функции...
 
 def index(request):
     products = Product.objects.all()[:20]
@@ -188,23 +191,3 @@ def add_review(request, product_id):
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/categories.html', {'categories': categories})
-
-@login_required
-def checkout(request):
-    cart = get_cart(request)
-    cart_items = cart.items.all()
-
-    if request.method == 'POST':
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        order = Order.objects.create(user=request.user)
-        for item in cart_items:
-            OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
-        cart.items.all().delete()
-        return redirect('order_detail', pk=order.pk)
-
-    return render(request, 'orders/checkout.html', {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
