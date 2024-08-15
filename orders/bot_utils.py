@@ -1,8 +1,9 @@
 import json
 import os
 import logging
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, types
 from django.conf import settings
+
 
 # Загрузка конфигурации
 config_path = os.path.join(settings.BASE_DIR, 'config.json')
@@ -18,7 +19,6 @@ CHAT_ID = config['chat_id']
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
 
 def notify_new_order(order):
     message = construct_order_message(order)
@@ -36,4 +36,9 @@ def construct_order_message(order):
     return message
 
 def send_message_to_telegram(message):
-    bot.loop.run_until_complete(bot.send_message(chat_id=CHAT_ID, text=message))
+    async def send_message():
+        await bot.send_message(chat_id=CHAT_ID, text=message)
+
+    import asyncio
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(send_message())
