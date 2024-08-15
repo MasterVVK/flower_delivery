@@ -47,7 +47,7 @@ def checkout(request):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
-            return redirect('login')
+            return redirect(f'{reverse("login")}?next={reverse("checkout")}')
 
         order = Order.objects.create(user=request.user)
         for item in cart_items:
@@ -61,7 +61,8 @@ def checkout(request):
 @login_required
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    return render(request, 'orders/order_detail.html', {'order': order})
+    order_products = OrderProduct.objects.filter(order=order)
+    return render(request, 'orders/order_detail.html', {'order': order, 'order_products': order_products})
 
 def index(request):
     products = Product.objects.all()[:20]

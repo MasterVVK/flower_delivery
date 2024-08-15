@@ -7,7 +7,7 @@
 <p>Статус: {{ order.get_status_display }}</p>
 <h3>Продукты:</h3>
 <ul>
-    {% for order_product in order.orderproduct_set.all %}
+    {% for order_product in order_products %}
     <li>{{ order_product.quantity }} x {{ order_product.product.name }}</li>
     {% endfor %}
 </ul>
