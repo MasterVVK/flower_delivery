@@ -1,3 +1,4 @@
+import asyncio
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, ProductCategory, Cart, CartItem, Order, OrderProduct, Review
 from .forms import ProductForm, ProductCategoryForm, OrderForm, ReviewForm
