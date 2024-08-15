@@ -1,16 +1,14 @@
-<!-- templates/orders/order_detail.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Детали заказа</h2>
-    <p>Номер заказа: {{ order.id }}</p>
-    <p>Пользователь: {{ order.user.username }}</p>
-    <p>Статус: {{ order.get_status_display }}</p>
-    <h3>Продукты:</h3>
-    <ul>
+<h2>Детали заказа</h2>
+<p>Номер заказа: {{ order.id }}</p>
+<p>Пользователь: {{ order.user.username }}</p>
+<p>Статус: {{ order.get_status_display }}</p>
+<h3>Продукты:</h3>
+<ul>
     {% for order_product in order.orderproduct_set.all %}
-        <li>{{ order_product.quantity }} x {{ order_product.product.name }}</li>
+    <li>{{ order_product.quantity }} x {{ order_product.product.name }}</li>
     {% endfor %}
-    </ul>
+</ul>
 {% endblock %}
