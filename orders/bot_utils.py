@@ -3,9 +3,10 @@ import os
 import logging
 from aiogram import Bot
 from asgiref.sync import sync_to_async
+from django.conf import settings
 
 # Загрузка конфигурации
-config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')
+config_path = os.path.join(settings.BASE_DIR, 'config.json')
 if not os.path.exists(config_path):
     raise FileNotFoundError(f"Файл конфигурации не найден: {config_path}")
 

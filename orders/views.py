@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.contrib.auth.models import User
 
 def get_cart(request):
     if request.user.is_authenticated:
