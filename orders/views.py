@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from .bot_utils import notify_new_order
 
 
 def get_cart(request):
@@ -43,7 +44,7 @@ def remove_from_cart(request, product_id):
     return redirect('cart_detail')
 
 
-@login_required
+login_required
 def checkout(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
@@ -53,10 +54,10 @@ def checkout(request):
         for item in cart_items:
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
         cart.items.all().delete()
+        notify_new_order(order)  # Отправка уведомления после добавления продуктов в заказ
         return redirect('order_detail', pk=order.pk)
 
     return render(request, 'orders/checkout.html', {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
-
 
 @login_required
 def order_detail(request, pk):
