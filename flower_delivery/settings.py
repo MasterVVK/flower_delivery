@@ -126,7 +126,6 @@ LOGGING = {
     },
 }
 
-
 AIORGRAM_API_TOKEN = config['telegram_token']
 WEBHOOK_URL = config['webhook_url']
 
@@ -139,5 +138,6 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+LOGIN_URL = 'login'  # Добавлено для правильного перенаправления
 
 AUTH_USER_MODEL = 'users.CustomUser'

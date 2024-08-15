@@ -40,13 +40,15 @@ def remove_from_cart(request, product_id):
     cart_item.delete()
     return redirect('cart_detail')
 
-@login_required
 def checkout(request):
-    messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
     cart = get_cart(request)
     cart_items = cart.items.all()
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
+            return redirect('login')
+
         order = Order.objects.create(user=request.user)
         for item in cart_items:
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
