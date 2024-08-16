@@ -46,17 +46,20 @@ def add_to_cart(request, product_id):
     cart_item.save()
     return redirect('cart_detail')
 
+
 def cart_detail(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
     total = sum(item.quantity * item.product.price for item in cart_items)
     return render(request, 'orders/cart_detail.html', {'cart_items': cart_items, 'total': total})
 
+
 def remove_from_cart(request, product_id):
     cart = get_cart(request)
     cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
     cart_item.delete()
     return redirect('cart_detail')
+
 
 def checkout(request):
     cart = get_cart(request)
@@ -65,7 +68,8 @@ def checkout(request):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             # Сохраняем данные корзины в сессии
-            request.session['cart_items'] = [{'product_id': item.product.id, 'quantity': item.quantity} for item in cart_items]
+            request.session['cart_items'] = [{'product_id': item.product.id, 'quantity': item.quantity} for item in
+                                             cart_items]
             messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
             return redirect(f'{reverse("login")}?next={reverse("checkout")}')
 
@@ -85,7 +89,9 @@ def checkout(request):
         notify_new_order(order)
         return redirect('order_detail', pk=order.pk)
 
-    return render(request, 'orders/checkout.html', {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
+    return render(request, 'orders/checkout.html',
+                  {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
+
 
 @login_required
 def order_detail(request, pk):
@@ -93,9 +99,11 @@ def order_detail(request, pk):
     order_products = OrderProduct.objects.filter(order=order)
     return render(request, 'orders/order_detail.html', {'order': order, 'order_products': order_products})
 
+
 def index(request):
     products = Product.objects.all()[:20]
     return render(request, 'orders/index.html', {'products': products})
+
 
 def load_more_products(request):
     page = request.GET.get('page', 1)
@@ -112,8 +120,10 @@ def load_more_products(request):
 
     return JsonResponse({'products': products_list, 'has_next': products.has_next()})
 
+
 def is_manager(user):
     return user.role == 'Manager' or user.role == 'Admin'
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -121,6 +131,7 @@ def manage_products(request):
     products = Product.objects.all()
     categories = ProductCategory.objects.all()
     return render(request, 'orders/manage_products.html', {'products': products, 'categories': categories})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -133,6 +144,7 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'orders/add_product.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -147,12 +159,14 @@ def edit_product(request, product_id):
         form = ProductForm(instance=product)
     return render(request, 'orders/edit_product.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_manager)
 def delete_product(request, product_id):
     product = Product.objects.get(id=product_id)
     product.delete()
     return redirect('manage_products')
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -165,6 +179,7 @@ def add_category(request):
     else:
         form = ProductCategoryForm()
     return render(request, 'orders/add_category.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_manager)
@@ -179,6 +194,7 @@ def edit_category(request, category_id):
         form = ProductCategoryForm(instance=category)
     return render(request, 'orders/edit_category.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_manager)
 def delete_category(request, category_id):
@@ -186,14 +202,17 @@ def delete_category(request, category_id):
     category.delete()
     return redirect('manage_products')
 
+
 def product_list(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/product_list.html', {'categories': categories})
+
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     reviews = Review.objects.filter(product=product)
     return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
+
 
 @login_required
 def order_create(request, product_id):
@@ -203,6 +222,7 @@ def order_create(request, product_id):
         OrderProduct.objects.create(order=order, product=product, quantity=1)
         return redirect('order_detail', pk=order.pk)
     return render(request, 'orders/order_form.html', {'product': product})
+
 
 @login_required
 def add_review(request, product_id):
@@ -218,6 +238,7 @@ def add_review(request, product_id):
     else:
         form = ReviewForm()
     return render(request, 'orders/review_form.html', {'form': form, 'product': product})
+
 
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')

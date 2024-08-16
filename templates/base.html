@@ -61,6 +61,7 @@
             <ul>
                 <li><a href="{% url 'index' %}">Главная</a></li>
                 <li><a href="{% url 'categories' %}">Категории</a></li>
+                <li><a href="{% url 'cart_detail' %}">Корзина</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'profile' %}">Профиль</a></li>
                     <li>
