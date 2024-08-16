@@ -8,13 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, 'config.json')) as config_file:
     config = json.load(config_file)
 
-# Получение секретного ключа из конфигурационного файла, если он отсутствует, используется значение по умолчанию (замените на ваше собственное значение)
+# Секретный ключ и настройки отладки
 SECRET_KEY = config.get('secret_key', 'django-insecure-)m*(m4k=ee(*m8gpbmp2t-(6v)p%w4d%7@w2)@uj@5s3+4_b&(')
-
-# Получение значения DEBUG из конфигурационного файла, если оно отсутствует, используется значение False
 DEBUG = config.get('debug', False)
-
-# Разрешенные хосты, берутся из конфигурационного файла
 ALLOWED_HOSTS = config.get('allowed_hosts', ['fd.vivikey.tech'])
 
 INSTALLED_APPS = [
@@ -136,8 +132,13 @@ SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
+# Session management
+SESSION_COOKIE_AGE = 1209600  # 2 недели
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Сессия сохраняется после закрытия браузера
+
+# Redirect settings
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
-LOGIN_URL = 'login'  # Добавлено для правильного перенаправления
+LOGIN_URL = 'login'  # URL для страницы логина
 
 AUTH_USER_MODEL = 'users.CustomUser'
