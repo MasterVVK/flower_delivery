@@ -8,30 +8,44 @@ from django.http import JsonResponse
 from .bot_utils import notify_new_order
 from django.contrib import messages
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def get_cart(request):
     if request.user.is_authenticated:
+        logger.debug(f"Authenticated user: {request.user}")
         cart, created = Cart.objects.get_or_create(user=request.user)
+        logger.debug(f"User cart found or created: {cart.id} (Created: {created})")
 
         # Если есть сессионная корзина, объединим её с корзиной пользователя
         session_key = request.session.session_key
         if session_key:
+            logger.debug(f"Session key: {session_key}")
             try:
                 guest_cart = Cart.objects.get(session_key=session_key)
+                logger.debug(f"Guest cart found: {guest_cart.id}")
+
                 if guest_cart and guest_cart.items.exists():
                     for item in guest_cart.items.all():
                         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
                         if not created:
                             cart_item.quantity += item.quantity
                         cart_item.save()
-                    guest_cart.delete()  # Удаляем корзину гостя после объединения
+                        logger.debug(f"Added item {item.product.name} (Quantity: {item.quantity}) to user cart")
+
+                    guest_cart.delete()
+                    logger.debug("Guest cart deleted after merging")
             except Cart.DoesNotExist:
-                pass
+                logger.debug("No guest cart found for this session")
     else:
         session_key = request.session.session_key
         if not session_key:
             request.session.create()
             session_key = request.session.session_key
+            logger.debug(f"New session created with key: {session_key}")
         cart, created = Cart.objects.get_or_create(session_key=session_key)
+        logger.debug(f"Guest cart found or created: {cart.id} (Created: {created})")
 
     return cart
 
@@ -62,25 +76,29 @@ def checkout(request):
 
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            # Сохраняем данные корзины в сессии
-            request.session['cart_items'] = [{'product_id': item.product.id, 'quantity': item.quantity} for item in
-                                             cart_items]
+            logger.debug("User not authenticated, saving cart items in session")
+            request.session['cart_items'] = [{'product_id': item.product.id, 'quantity': item.quantity} for item in cart_items]
+            logger.debug(f"Cart items saved in session: {request.session['cart_items']}")
             messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
             return redirect(f'{reverse("login")}?next={reverse("checkout")}')
 
-        # Восстанавливаем данные корзины из сессии после авторизации
         if 'cart_items' in request.session:
+            logger.debug(f"Restoring cart items from session: {request.session['cart_items']}")
             for item in request.session['cart_items']:
                 product = get_object_or_404(Product, id=item['product_id'])
                 cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
                 cart_item.quantity = item['quantity']
                 cart_item.save()
+                logger.debug(f"Restored item {product.name} to cart with quantity {cart_item.quantity}")
             del request.session['cart_items']
 
         order = Order.objects.create(user=request.user)
+        logger.debug(f"Order created: {order.id}")
         for item in cart.items.all():
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
+            logger.debug(f"Order item created: {item.product.name}, Quantity: {item.quantity}")
         cart.items.all().delete()
+        logger.debug("Cart cleared after order creation")
         notify_new_order(order)
         return redirect('order_detail', pk=order.pk)
 
