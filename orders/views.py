@@ -64,11 +64,22 @@ def checkout(request):
 
     if request.method == 'POST':
         if not request.user.is_authenticated:
+            # Сохраняем данные корзины в сессии
+            request.session['cart_items'] = [{'product_id': item.product.id, 'quantity': item.quantity} for item in cart_items]
             messages.info(request, 'Для оформления заказа необходимо авторизоваться.')
             return redirect(f'{reverse("login")}?next={reverse("checkout")}')
 
+        # Восстанавливаем данные корзины из сессии после авторизации
+        if 'cart_items' in request.session:
+            for item in request.session['cart_items']:
+                product = get_object_or_404(Product, id=item['product_id'])
+                cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+                cart_item.quantity = item['quantity']
+                cart_item.save()
+            del request.session['cart_items']
+
         order = Order.objects.create(user=request.user)
-        for item in cart_items:
+        for item in cart.items.all():
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
         cart.items.all().delete()
         notify_new_order(order)
