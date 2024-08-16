@@ -32,17 +32,21 @@ def login_view(request):
                     guest_cart = Cart.objects.get(session_key=session_key)
                     user_cart, created = Cart.objects.get_or_create(user=user)
 
+                    # Переносим товары из корзины гостя в корзину пользователя
                     for item in guest_cart.items.all():
                         cart_item, created = CartItem.objects.get_or_create(cart=user_cart, product=item.product)
                         if not created:
                             cart_item.quantity += item.quantity
                         cart_item.save()
 
-                    guest_cart.delete()  # Удаление сессионной корзины после объединения
+                    # Удаляем сессионную корзину только после того, как перенесли все товары
+                    guest_cart.delete()
                 except Cart.DoesNotExist:
                     pass
 
-            return redirect('product_list')
+            # Перенаправление на страницу, с которой пользователь пришел, или на главную страницу
+            next_url = request.POST.get('next', 'index')
+            return redirect(next_url)
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
