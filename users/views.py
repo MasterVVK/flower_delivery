@@ -5,8 +5,12 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
-from orders.models import Cart, CartItem
+from orders.models import Product, Cart, CartItem
+from django.shortcuts import render, redirect, get_object_or_404
+
+
 import logging
+
 logger = logging.getLogger(__name__)
 
 def register(request):
@@ -20,40 +24,42 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            logger.debug(f"User {user.username} logged in")
-            login(request, user)
-
             session_key = request.session.session_key
+
+            # Сохраняем товары из корзины гостя
+            guest_cart_items = []
             if session_key:
-                logger.debug(f"Session key after login: {session_key}")
                 try:
                     guest_cart = Cart.objects.get(session_key=session_key)
-                    user_cart, created = Cart.objects.get_or_create(user=user)
-                    logger.debug(f"Merging guest cart {guest_cart.id} into user cart {user_cart.id}")
-
-                    for item in guest_cart.items.all():
-                        cart_item, created = CartItem.objects.get_or_create(cart=user_cart, product=item.product)
-                        if not created:
-                            cart_item.quantity += item.quantity
-                        cart_item.save()
-                        logger.debug(f"Item {item.product.name} added to user cart")
-
-                    guest_cart.delete()
-                    logger.debug("Guest cart deleted after merging")
+                    guest_cart_items = [{'product_id': item.product.id, 'quantity': item.quantity} for item in
+                                        guest_cart.items.all()]
                 except Cart.DoesNotExist:
-                    logger.debug("No guest cart found to merge")
+                    guest_cart_items = []
+
+            login(request, user)
+
+            if guest_cart_items:
+                # Восстанавливаем товары в корзину пользователя после авторизации
+                user_cart, created = Cart.objects.get_or_create(user=user)
+                for item in guest_cart_items:
+                    product = Product.objects.get(id=item['product_id'])
+                    cart_item, created = CartItem.objects.get_or_create(cart=user_cart, product=product)
+                    if not created:
+                        cart_item.quantity += item['quantity']
+                    cart_item.save()
 
             next_url = request.POST.get('next', 'index')
-            logger.debug(f"Redirecting to {next_url}")
             return redirect(next_url)
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
+
 
 @login_required
 def profile(request):
