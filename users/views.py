@@ -33,37 +33,42 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-
-            # Сохраняем данные корзины гостя до того, как перезапишется сессия
             session_key = request.session.session_key
+
+            # Сохраняем корзину гостя до логина
             guest_cart_items = []
             if session_key:
                 try:
                     guest_cart = Cart.objects.get(session_key=session_key)
-                    guest_cart_items = [{'product_id': item.product.id, 'quantity': item.quantity} for item in
-                                        guest_cart.items.all()]
+                    guest_cart_items = [{'product_id': item.product.id, 'quantity': item.quantity} for item in guest_cart.items.all()]
                 except Cart.DoesNotExist:
                     guest_cart_items = []
 
-            # Логиним пользователя (создается новая сессия)
+            # Логиним пользователя, что перезаписывает сессию
             login(request, user)
 
-            # Объединяем гостевую корзину с корзиной пользователя
+            # Восстанавливаем товары в корзину пользователя после авторизации
             if guest_cart_items:
                 user_cart, created = Cart.objects.get_or_create(user=user)
                 for item in guest_cart_items:
-                    product = Product.objects.get(id=item['product_id'])
+                    product = get_object_or_404(Product, id=item['product_id'])
                     cart_item, created = CartItem.objects.get_or_create(cart=user_cart, product=product)
                     if not created:
                         cart_item.quantity += item['quantity']
                     cart_item.save()
 
-            # Перенаправление после успешной авторизации
+            # Удаляем старую сессию гостя
+            if session_key:
+                try:
+                    guest_cart = Cart.objects.get(session_key=session_key)
+                    guest_cart.delete()
+                except Cart.DoesNotExist:
+                    pass
+
             next_url = request.POST.get('next', 'index')
             return redirect(next_url)
     else:
         form = AuthenticationForm()
-
     return render(request, 'users/login.html', {'form': form})
 
 
