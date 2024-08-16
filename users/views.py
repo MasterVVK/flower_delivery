@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from orders.models import Product, Cart, CartItem
 from django.shortcuts import render, redirect, get_object_or_404
-
+from django.contrib.sessions.models import Session
 
 import logging
 
@@ -25,14 +25,17 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
+
+
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            session_key = request.session.session_key
 
-            # Сохраняем товары из корзины гостя
+            # Сохраняем данные корзины гостя до того, как перезапишется сессия
+            session_key = request.session.session_key
             guest_cart_items = []
             if session_key:
                 try:
@@ -42,10 +45,11 @@ def login_view(request):
                 except Cart.DoesNotExist:
                     guest_cart_items = []
 
+            # Логиним пользователя (создается новая сессия)
             login(request, user)
 
+            # Объединяем гостевую корзину с корзиной пользователя
             if guest_cart_items:
-                # Восстанавливаем товары в корзину пользователя после авторизации
                 user_cart, created = Cart.objects.get_or_create(user=user)
                 for item in guest_cart_items:
                     product = Product.objects.get(id=item['product_id'])
@@ -54,10 +58,12 @@ def login_view(request):
                         cart_item.quantity += item['quantity']
                     cart_item.save()
 
+            # Перенаправление после успешной авторизации
             next_url = request.POST.get('next', 'index')
             return redirect(next_url)
     else:
         form = AuthenticationForm()
+
     return render(request, 'users/login.html', {'form': form})
 
 
