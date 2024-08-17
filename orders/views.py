@@ -257,3 +257,8 @@ def update_cart_item(request, product_id):
         cart_item.save()
 
     return redirect('cart_detail')
+
+@login_required
+def order_list(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'orders/order_list.html', {'orders': orders})
