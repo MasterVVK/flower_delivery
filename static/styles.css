@@ -234,3 +234,72 @@ form button:hover {
 .scroll-button:hover .icon {
     filter: invert(34%) sepia(99%) saturate(7499%) hue-rotate(189deg) brightness(97%) contrast(102%); /* Синий цвет при наведении */
 }
+
+/* Стили для таблицы заказа */
+.order-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.order-summary-table th,
+.order-summary-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-summary-table thead tr {
+    background-color: #f2f2f2;
+}
+
+.order-total {
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* Стили для кнопок на странице оформления заказа */
+.order-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.order-button-form {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.confirm-button {
+    background-color: #007bff; /* Синий цвет, как в основном стиле */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #0056b3; /* Более тёмный синий цвет при наведении */
+}
+
+.cancel-button {
+    background-color: #f44336; /* Красный цвет для отмены */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #e53935; /* Более тёмный красный цвет при наведении */
+}

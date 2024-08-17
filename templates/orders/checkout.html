@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load orders_filters %} <!-- Загрузка кастомных фильтров -->
+{% load orders_filters %}
 
 {% block title %}Оформление заказа{% endblock %}
 
@@ -7,7 +7,7 @@
 <h2>Оформление заказа</h2>
 
 <!-- Таблица с составом заказа -->
-<table>
+<table class="order-summary-table">
     <thead>
         <tr>
             <th>Товар</th>
@@ -22,18 +22,25 @@
             <td>{{ item.product.name }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.product.price }} руб.</td>
-            <td>{{ item.quantity|multiply:item.product.price }} руб.</td> <!-- Использование фильтра multiply -->
+            <td>{{ item.quantity|multiply:item.product.price }} руб.</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
 <!-- Отображение общей суммы заказа -->
-<p>Итого: {{ total }} руб.</p>
+<p class="order-total">Итого: {{ total }} руб.</p>
 
-<!-- Форма для подтверждения заказа -->
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Подтвердить заказ</button>
-</form>
+<!-- Кнопки подтверждения и отмены -->
+<div class="order-buttons">
+    <form method="post" class="order-button-form">
+        {% csrf_token %}
+        <button type="submit" class="confirm-button">Подтвердить заказ</button>
+    </form>
+
+    <form action="{% url 'cart_detail' %}" method="get" class="order-button-form">
+        <button type="submit" class="cancel-button">Отменить</button>
+    </form>
+</div>
+
 {% endblock %}
