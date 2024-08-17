@@ -25,8 +25,8 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
+
 def login_view(request):
-    print("LOGIN")
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -61,7 +61,10 @@ def login_view(request):
                     cart_item.save()
                 logging.info(f"User cart items after merging: {list(user_cart.items.all())}")
 
-            next_url = request.POST.get('next', 'index')
+            # Получаем и логируем next_url
+            next_url = request.POST.get('next') or request.GET.get('next') or 'index'
+            logging.debug(f"Redirecting to: {next_url}")
+
             return redirect(next_url)
     else:
         form = AuthenticationForm()
