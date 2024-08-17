@@ -10,13 +10,13 @@ from django.contrib import messages
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('my_custom_logger')
 
 def get_cart(request):
     if request.user.is_authenticated:
         logger.debug(f"Authenticated user: {request.user}")
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        logger.debug(f"User cart found or created: {cart.id} (Created: {created})")
+        cart, creatinfoed = Cart.objects.get_or_create(user=request.user)
+        logger.debug(f"User cart found or created: {cart.id} ")
 
         # Если есть сессионная корзина, объединим её с корзиной пользователя
         session_key = request.session.session_key
@@ -73,7 +73,6 @@ def remove_from_cart(request, product_id):
 def checkout(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
-
     if request.method == 'POST':
         if not request.user.is_authenticated:
             logger.debug("User not authenticated, saving cart items in session")

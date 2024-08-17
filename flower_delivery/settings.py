@@ -11,6 +11,7 @@ with open(os.path.join(BASE_DIR, 'config.json')) as config_file:
 # Секретный ключ и настройки отладки
 SECRET_KEY = config.get('secret_key', 'django-insecure-)m*(m4k=ee(*m8gpbmp2t-(6v)p%w4d%7@w2)@uj@5s3+4_b&(')
 DEBUG = config.get('debug', False)
+
 ALLOWED_HOSTS = config.get('allowed_hosts', ['fd.vivikey.tech'])
 
 INSTALLED_APPS = [
@@ -107,20 +108,20 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+        'console': {
+            'level': 'DEBUG',  # Уровень логирования
+            'class': 'logging.StreamHandler',  # Класс, отвечающий за вывод в консоль
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
+        'my_custom_logger': {
+            'handlers': ['console'],  # Подключаем handler 'console' к нашему кастомному логгеру
+            'level': 'DEBUG',  # Уровень логирования для кастомного логгера
+            'propagate': False,  # Отключаем передачу сообщений другим логгерам
         },
     },
 }
+
 
 AIORGRAM_API_TOKEN = config['telegram_token']
 WEBHOOK_URL = config['webhook_url']

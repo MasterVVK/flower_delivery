@@ -11,7 +11,7 @@ from django.contrib.sessions.models import Session
 
 import logging
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 def register(request):
     if request.method == 'POST':
@@ -28,6 +28,7 @@ def register(request):
 
 
 
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -35,19 +36,24 @@ def login_view(request):
             user = form.get_user()
             session_key = request.session.session_key
 
-            # Сохраняем корзину гостя до логина
+            # Логгирование текущей сессии
+            logging.info(f"Session key before login: {session_key}")
+
             guest_cart_items = []
             if session_key:
                 try:
                     guest_cart = Cart.objects.get(session_key=session_key)
                     guest_cart_items = [{'product_id': item.product.id, 'quantity': item.quantity} for item in guest_cart.items.all()]
+                    logging.info(f"Guest cart items: {guest_cart_items}")
                 except Cart.DoesNotExist:
-                    guest_cart_items = []
+                    logging.info("Guest cart does not exist")
 
-            # Логиним пользователя, что перезаписывает сессию
+            # Логиним пользователя
             login(request, user)
 
-            # Восстанавливаем товары в корзину пользователя после авторизации
+            # Логгирование новой сессии
+            logging.info(f"Session key after login: {request.session.session_key}")
+
             if guest_cart_items:
                 user_cart, created = Cart.objects.get_or_create(user=user)
                 for item in guest_cart_items:
@@ -56,20 +62,14 @@ def login_view(request):
                     if not created:
                         cart_item.quantity += item['quantity']
                     cart_item.save()
-
-            # Удаляем старую сессию гостя
-            if session_key:
-                try:
-                    guest_cart = Cart.objects.get(session_key=session_key)
-                    guest_cart.delete()
-                except Cart.DoesNotExist:
-                    pass
+                logging.info(f"User cart items after merging: {list(user_cart.items.all())}")
 
             next_url = request.POST.get('next', 'index')
             return redirect(next_url)
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
+
 
 
 @login_required
