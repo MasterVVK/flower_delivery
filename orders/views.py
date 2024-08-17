@@ -104,6 +104,7 @@ def checkout(request):
     return render(request, 'orders/checkout.html',
                   {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
 
+
 @login_required
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
