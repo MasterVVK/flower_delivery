@@ -12,7 +12,14 @@
         <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
         <div class="order-item-details">
             <h3 class="order-item-name">{{ item.product.name }}</h3>
-            <p class="order-item-quantity">Количество: {{ item.quantity }}</p>
+            <form method="post" action="{% url 'update_cart_item' item.product.id %}">
+                {% csrf_token %}
+                <div class="quantity-controls">
+                    <button type="submit" name="action" value="decrease" class="quantity-button">-</button>
+                    <input type="text" name="quantity" value="{{ item.quantity }}" readonly class="quantity-input">
+                    <button type="submit" name="action" value="increase" class="quantity-button">+</button>
+                </div>
+            </form>
             <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
             <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
             <form method="post" action="{% url 'remove_from_cart' item.product.id %}">

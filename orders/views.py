@@ -240,3 +240,20 @@ def add_review(request, product_id):
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/categories.html', {'categories': categories})
+
+
+
+def update_cart_item(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart = get_cart(request)
+    cart_item = get_object_or_404(CartItem, cart=cart, product=product)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'increase':
+            cart_item.quantity += 1
+        elif action == 'decrease' and cart_item.quantity > 1:
+            cart_item.quantity -= 1
+        cart_item.save()
+
+    return redirect('cart_detail')

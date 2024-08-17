@@ -23,4 +23,6 @@ urlpatterns = [
     path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('checkout/', views.checkout, name='checkout'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('cart/', views.cart_detail, name='cart_detail'),
+    path('cart/update/<int:product_id>/', views.update_cart_item, name='update_cart_item'),
 ]
