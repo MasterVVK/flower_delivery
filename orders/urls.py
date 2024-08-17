@@ -2,6 +2,7 @@ from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path('manage_products/', views.manage_products, name='manage_products'),
     path('add_product/', views.add_product, name='add_product'),
@@ -21,6 +22,5 @@ urlpatterns = [
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('checkout/', views.checkout, name='checkout'),
-    path('login/', include('users.urls')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
