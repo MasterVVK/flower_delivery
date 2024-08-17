@@ -57,17 +57,18 @@ def login_view(request):
                     cart_item.save()
                 logger.info(f"User cart items after merging: {list(user_cart.items.all())}")
 
-            # Если параметр next пустой, установим его значение на страницу заказа
+            # Обработка параметра next
             next_url = request.POST.get('next') or request.GET.get('next')
-            if not next_url:
-                next_url = 'checkout'  # Задаем значение по умолчанию
+            if not next_url or next_url == 'index':  # Если next пуст или равен главной странице
+                next_url = 'index'  # Перенаправляем на главную страницу
 
             logger.info(f"Redirecting to: {next_url}")
 
             return redirect(next_url)
     else:
         form = AuthenticationForm()
-    return render(request, 'users/login.html', {'form': form})
+        next_url = request.GET.get('next', '')
+    return render(request, 'users/login.html', {'form': form, 'next': next_url})
 
 
 @login_required
