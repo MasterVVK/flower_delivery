@@ -15,7 +15,7 @@ logger = logging.getLogger('my_custom_logger')
 def get_cart(request):
     if request.user.is_authenticated:
         logger.debug(f"Authenticated user: {request.user}")
-        cart, creatinfoed = Cart.objects.get_or_create(user=request.user)
+        cart, created = Cart.objects.get_or_create(user=request.user)
         logger.debug(f"User cart found or created: {cart.id} ")
 
         # Если есть сессионная корзина, объединим её с корзиной пользователя
