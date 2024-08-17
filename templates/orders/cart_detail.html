@@ -5,31 +5,30 @@
 
 {% block content %}
 <h2>Корзина</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Товар</th>
-            <th>Количество</th>
-            <th>Цена</th>
-            <th>Удалить</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in cart_items %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.quantity|multiply:item.product.price }} руб.</td>
-            <td>
-                <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Удалить</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p>Общая сумма: {{ total }} руб.</p>
-<a href="{% url 'checkout' %}">Оформить заказ</a>
+
+<div class="order-items-container">
+    {% for item in cart_items %}
+    <div class="order-item-card">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+        <div class="order-item-details">
+            <h3 class="order-item-name">{{ item.product.name }}</h3>
+            <p class="order-item-quantity">Количество: {{ item.quantity }}</p>
+            <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
+            <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
+            <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="cancel-button">Удалить</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<p class="order-total">Итого: {{ total }} руб.</p>
+
+<div class="order-buttons">
+    <a href="{% url 'index' %}" class="continue-shopping-button">Продолжить покупки</a>
+    <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
+</div>
+
 {% endblock %}
