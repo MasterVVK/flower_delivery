@@ -9,7 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('fileviewer/', include('fileviewer.urls')),
     path('users/', include('users.urls')),
-    path('login/', include('users.urls')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('', include('orders.urls')),  # Маршруты для приложения orders
 ]
