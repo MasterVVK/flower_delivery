@@ -304,4 +304,63 @@ form button:hover {
     background-color: #e53935; /* Более тёмный красный цвет при наведении */
 }
 
+/* Стили для контейнера карточек товаров на странице оформления заказа */
+.order-items-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
 
+/* Стили для карточек товаров */
+.order-item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 15px;
+    max-width: 200px;
+    text-align: center;
+}
+
+/* Стили для изображений товаров внутри карточек */
+.order-item-card .product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Стили для текста внутри карточек */
+.order-item-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.order-item-quantity,
+.order-item-price,
+.order-item-sum {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Адаптивные стили для страницы оформления заказа */
+@media (max-width: 768px) {
+    .order-items-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .order-item-card {
+        max-width: 100%;
+    }
+
+    .confirm-button, .cancel-button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
