@@ -6,27 +6,20 @@
 {% block content %}
 <h2>Оформление заказа</h2>
 
-<!-- Таблица с составом заказа -->
-<table class="order-summary-table">
-    <thead>
-        <tr>
-            <th>Товар</th>
-            <th>Количество</th>
-            <th>Цена за единицу</th>
-            <th>Сумма</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in cart_items %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.product.price }} руб.</td>
-            <td>{{ item.quantity|multiply:item.product.price }} руб.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!-- Контейнер для карточек товаров -->
+<div class="order-items-container">
+    {% for item in cart_items %}
+    <div class="order-item-card">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+        <div class="order-item-details">
+            <h3 class="order-item-name">{{ item.product.name }}</h3>
+            <p class="order-item-quantity">Количество: {{ item.quantity }}</p>
+            <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
+            <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
 <!-- Отображение общей суммы заказа -->
 <p class="order-total">Итого: {{ total }} руб.</p>
