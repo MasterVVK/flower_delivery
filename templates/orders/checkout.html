@@ -1,10 +1,37 @@
 {% extends 'base.html' %}
+{% load orders_filters %} <!-- Загрузка кастомных фильтров -->
 
 {% block title %}Оформление заказа{% endblock %}
 
 {% block content %}
 <h2>Оформление заказа</h2>
-<p>Вы находитесь в процессе оформления заказа. Пожалуйста, подтвердите ваш заказ.</p>
+
+<!-- Таблица с составом заказа -->
+<table>
+    <thead>
+        <tr>
+            <th>Товар</th>
+            <th>Количество</th>
+            <th>Цена за единицу</th>
+            <th>Сумма</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart_items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.price }} руб.</td>
+            <td>{{ item.quantity|multiply:item.product.price }} руб.</td> <!-- Использование фильтра multiply -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Отображение общей суммы заказа -->
+<p>Итого: {{ total }} руб.</p>
+
+<!-- Форма для подтверждения заказа -->
 <form method="post">
     {% csrf_token %}
     <button type="submit">Подтвердить заказ</button>
