@@ -138,7 +138,7 @@ SESSION_COOKIE_AGE = 1209600  # 2 недели
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Сессия сохраняется после закрытия браузера
 
 # Redirect settings
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'index'
 LOGIN_URL = 'login'  # URL для страницы логина
 

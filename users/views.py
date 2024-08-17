@@ -25,10 +25,6 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
-
-
-
-
 def login_view(request):
     print("LOGIN")
     if request.method == 'POST':
