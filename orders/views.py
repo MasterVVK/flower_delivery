@@ -109,7 +109,13 @@ def checkout(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order_products = OrderProduct.objects.filter(order=order)
-    return render(request, 'orders/order_detail.html', {'order': order, 'order_products': order_products})
+    total = sum(item.product.price * item.quantity for item in order_products)
+    return render(request, 'orders/order_detail.html', {
+        'order': order,
+        'order_products': order_products,
+        'total': total,  # Передаем total в шаблон
+    })
+
 
 def index(request):
     products = Product.objects.all()[:20]
