@@ -265,3 +265,13 @@ def order_list(request):
         total_sum = sum(item.product.price * item.quantity for item in order.orderproduct_set.all())
         order.total = total_sum
     return render(request, 'orders/order_list.html', {'orders': orders})
+
+@login_required
+def cancel_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if order.status == 'P':
+        order.cancel()
+        messages.success(request, f'Заказ {order.id} был успешно отменен.')
+    else:
+        messages.error(request, 'Этот заказ не может быть отменен.')
+    return redirect('order_list')

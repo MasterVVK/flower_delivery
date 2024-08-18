@@ -14,6 +14,7 @@
             <th>Общая сумма</th>
             <th>Статус</th>
             <th>Детали</th>
+            <th>Действия</th>  <!-- Новый столбец для действий -->
         </tr>
     </thead>
     <tbody>
@@ -24,6 +25,14 @@
             <td>{{ order.total }} руб.</td>
             <td>{{ order.get_status_display }}</td>
             <td><a href="{% url 'order_detail' order.id %}">Посмотреть</a></td>
+            <td>
+                {% if order.status == 'P' %}
+                    <form action="{% url 'cancel_order' order.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="cancel-button">Отменить</button>
+                    </form>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

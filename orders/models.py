@@ -46,6 +46,7 @@ class Order(models.Model):
         ('P', 'В ожидании'),
         ('C', 'Завершен'),
         ('F', 'Неудачно'),
+        ('X', 'Отменен'),  # Новый статус для отмены
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
@@ -53,12 +54,18 @@ class Order(models.Model):
     status = models.CharField(_("Статус"), max_length=1, choices=STATUS_CHOICES, default='P')
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
 
+    def cancel(self):
+        if self.status == 'P':
+            self.status = 'X'
+            self.save()
+
     def __str__(self):
         return f"Заказ {self.id} от {self.user.username}"
 
     class Meta:
         verbose_name = _("Заказ")
         verbose_name_plural = _("Заказы")
+
 
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, verbose_name=_("Заказ"), on_delete=models.CASCADE)
