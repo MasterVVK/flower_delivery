@@ -6,7 +6,7 @@
 <h2>Мои заказы</h2>
 
 {% if orders %}
-<table>
+<table class="order-table">
     <thead>
         <tr>
             <th>Номер заказа</th>
@@ -22,7 +22,7 @@
             <td>{{ order.id }}</td>
             <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
             <td>{{ order.total }} руб.</td>
-            <td>{{ order.get_status_display }}</td> <!-- Используем get_status_display для расшифровки -->
+            <td>{{ order.get_status_display }}</td>
             <td><a href="{% url 'order_detail' order.id %}">Посмотреть</a></td>
         </tr>
         {% endfor %}
