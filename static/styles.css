@@ -453,3 +453,17 @@ form button:hover {
 .order-table a:hover {
     text-decoration: underline;
 }
+
+.add-to-cart-button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-to-cart-button:hover {
+    background-color: #218838;
+}

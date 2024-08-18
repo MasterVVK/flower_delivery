@@ -8,12 +8,18 @@
     <h2 class="page-title">Все товары</h2>
     <div id="product-list">
         {% for product in products %}
-            <div class="product-item">
+            <div class="product-item" id="product-{{ product.id }}">
                 <a href="{% url 'product_detail' pk=product.pk %}">
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
                     <h4 class="product-name">{{ product.name }}</h4>
                     <p class="product-price">{{ product.price }} руб.</p>
                 </a>
+
+                {% if product.id in cart_product_ids %}
+                    <p id="in-cart-{{ product.id }}">Этот товар уже в корзине</p>
+                {% else %}
+                    <button class="add-to-cart-button" data-product-id="{{ product.id }}">В корзину</button>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
@@ -66,5 +72,38 @@
     }
 
     window.addEventListener('scroll', handleScroll);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.add-to-cart-button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+
+                fetch("{% url 'add_to_cart' 0 %}".replace('0', productId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        'product_id': productId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const productDiv = document.getElementById('product-' + productId);
+                        const button = productDiv.querySelector('.add-to-cart-button');
+                        button.remove();
+                        const message = document.createElement('p');
+                        message.innerText = 'Этот товар уже в корзине';
+                        productDiv.appendChild(message);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
 </script>
 {% endblock %}

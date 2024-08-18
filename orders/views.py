@@ -49,13 +49,24 @@ def get_cart(request):
 
     return cart
 
+
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    cart = get_cart(request)
+
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+    else:
+        session_key = request.session.session_key or request.session.create()
+        cart, created = Cart.objects.get_or_create(session_key=session_key)
+
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    if not created:
-        cart_item.quantity += 1
+    cart_item.quantity += 1
     cart_item.save()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
+
+    messages.success(request, 'Товар добавлен в корзину.')
     return redirect('cart_detail')
 
 def cart_detail(request):
@@ -118,8 +129,21 @@ def order_detail(request, pk):
 
 
 def index(request):
-    products = Product.objects.all()[:20]
-    return render(request, 'orders/index.html', {'products': products})
+    products = Product.objects.all()
+
+    # Проверяем корзину: либо для авторизованного пользователя, либо по сессии
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+    else:
+        session_key = request.session.session_key or request.session.create()
+        cart, _ = Cart.objects.get_or_create(session_key=session_key)
+
+    cart_product_ids = cart.items.values_list('product_id', flat=True)
+
+    return render(request, 'orders/index.html', {
+        'products': products,
+        'cart_product_ids': cart_product_ids,  # Передаем список товаров в корзине
+    })
 
 def load_more_products(request):
     page = request.GET.get('page', 1)
