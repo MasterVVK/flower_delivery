@@ -454,16 +454,20 @@ form button:hover {
     text-decoration: underline;
 }
 
+/* Измененная кнопка "В корзину" */
 .add-to-cart-button {
-    background-color: #28a745;
+    background-color: #007bff; /* Синий цвет кнопки */
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
 }
 
 .add-to-cart-button:hover {
-    background-color: #218838;
+    background-color: #0056b3; /* Более темный синий цвет при наведении */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Увеличенная тень при наведении */
 }
