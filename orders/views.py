@@ -261,4 +261,7 @@ def update_cart_item(request, product_id):
 @login_required
 def order_list(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    for order in orders:
+        total_sum = sum(item.product.price * item.quantity for item in order.orderproduct_set.all())
+        order.total = total_sum
     return render(request, 'orders/order_list.html', {'orders': orders})
