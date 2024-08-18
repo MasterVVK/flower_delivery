@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from .bot_utils import notify_order_cancellation
 
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
@@ -58,6 +59,7 @@ class Order(models.Model):
         if self.status == 'P':
             self.status = 'X'
             self.save()
+            notify_order_cancellation(self)  # Добавляем уведомление при отмене
 
     def __str__(self):
         return f"Заказ {self.id} от {self.user.username}"
@@ -65,6 +67,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = _("Заказ")
         verbose_name_plural = _("Заказы")
+
 
 
 class OrderProduct(models.Model):

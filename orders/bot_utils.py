@@ -46,3 +46,20 @@ def send_message_to_telegram(message):
         logging.error(f"HTTP error occurred: {err}")
     except Exception as err:
         logging.error(f"An error occurred: {err}")
+
+def notify_order_cancellation(order):
+    message = construct_cancellation_message(order)
+    send_message_to_telegram(message)
+
+def construct_cancellation_message(order):
+    message = f"<b>Заказ №{order.id} был отменен</b>\n"
+    message += f"Пользователь: {order.user.username}\n"
+    message += f"Дата заказа: {order.created_at.strftime('%d.%m.%Y %H:%M')}\n"
+    message += "<b>Продукты:</b>\n"
+    order_products = order.orderproduct_set.all()
+    if order_products.exists():
+        for order_product in order_products:
+            message += f"{order_product.quantity} x {order_product.product.name}\n"
+    else:
+        message += "Нет продуктов в заказе.\n"
+    return message
