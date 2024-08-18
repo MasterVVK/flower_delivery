@@ -1,14 +1,27 @@
 {% extends 'base.html' %}
+{% load orders_filters %}
+
+{% block title %}Детали заказа{% endblock %}
 
 {% block content %}
 <h2>Детали заказа</h2>
-<p>Номер заказа: {{ order.id }}</p>
-<p>Пользователь: {{ order.user.username }}</p>
-<p>Статус: {{ order.get_status_display }}</p>
-<h3>Продукты:</h3>
-<ul>
-    {% for order_product in order_products %}
-    <li>{{ order_product.quantity }} x {{ order_product.product.name }}</li>
+
+<div class="order-items-container">
+    {% for item in order_products %}
+    <div class="order-item-card">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+        <div class="order-item-details">
+            <h3 class="order-item-name">{{ item.product.name }}</h3>
+            <p class="order-item-quantity">Количество: {{ item.quantity }}</p>
+            <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
+            <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+</div>
+
+<p class="order-total">Итого: {{ order.total }} руб.</p>
+
+<a href="{% url 'order_list' %}" class="confirm-button">Вернуться к заказам</a>
+
 {% endblock %}
