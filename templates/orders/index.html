@@ -32,26 +32,72 @@
     let page = 2;
     let isLoading = false;
 
+    function bindAddToCartButtons() {
+        const buttons = document.querySelectorAll('.add-to-cart-button');
+
+        buttons.forEach(button => {
+            button.removeEventListener('click', handleAddToCart);  // Удаление старого обработчика
+            button.addEventListener('click', handleAddToCart);  // Добавление нового обработчика
+        });
+    }
+
+    function handleAddToCart(event) {
+        const button = event.currentTarget;
+        const productId = button.getAttribute('data-product-id');
+
+        fetch("{% url 'add_to_cart' 0 %}".replace('0', productId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'product_id': productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const productDiv = document.getElementById('product-' + productId);
+                const button = productDiv.querySelector('.add-to-cart-button');
+                button.remove();
+                const message = document.createElement('p');
+                message.innerText = 'Этот товар уже в корзине';
+                productDiv.appendChild(message);
+            }
+        })
+        .catch(error => console.error('Ошибка:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindAddToCartButtons();  // Привязываем обработчики при загрузке страницы
+    });
+
     function loadMoreProducts() {
         if (isLoading) return;
         isLoading = true;
         document.getElementById('loading').style.display = 'block';
-        
+
         fetch(`/api/products/?page=${page}`)
             .then(response => response.json())
             .then(data => {
                 const productList = document.getElementById('product-list');
                 data.products.forEach(product => {
-                    const productItem = document.createElement('div');
-                    productItem.classList.add('product-item');
-                    productItem.innerHTML = `
-                        <a href="${product.url}">
-                            <img src="${product.image}" alt="${product.name}" class="product-image">
-                            <h4 class="product-name">${product.name}</h4>
-                            <p class="product-price">${product.price} руб.</p>
-                        </a>
-                    `;
-                    productList.appendChild(productItem);
+                    // Проверяем, есть ли уже продукт с таким id в списке
+                    if (!document.getElementById('product-' + product.id)) {
+                        const productItem = document.createElement('div');
+                        productItem.classList.add('product-item');
+                        productItem.id = 'product-' + product.id;
+                        productItem.innerHTML = `
+                            <a href="${product.url}">
+                                <img src="${product.image}" alt="${product.name}" class="product-image">
+                                <h4 class="product-name">${product.name}</h4>
+                                <p class="product-price">${product.price} руб.</p>
+                            </a>
+                            <button class="add-to-cart-button" data-product-id="${product.id}">В корзину</button>
+                        `;
+                        productList.appendChild(productItem);
+                    }
                 });
                 page++;
                 isLoading = false;
@@ -59,6 +105,12 @@
                 if (!data.has_next) {
                     window.removeEventListener('scroll', handleScroll);
                 }
+                bindAddToCartButtons();  // Привязываем обработчики к новым элементам
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                isLoading = false;
+                document.getElementById('loading').style.display = 'none';
             });
     }
 
@@ -72,38 +124,5 @@
     }
 
     window.addEventListener('scroll', handleScroll);
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const buttons = document.querySelectorAll('.add-to-cart-button');
-
-        buttons.forEach(button => {
-            button.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-
-                fetch("{% url 'add_to_cart' 0 %}".replace('0', productId), {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: new URLSearchParams({
-                        'product_id': productId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const productDiv = document.getElementById('product-' + productId);
-                        const button = productDiv.querySelector('.add-to-cart-button');
-                        button.remove();
-                        const message = document.createElement('p');
-                        message.innerText = 'Этот товар уже в корзине';
-                        productDiv.appendChild(message);
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}
