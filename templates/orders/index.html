@@ -11,10 +11,38 @@
             <div class="product-item" id="product-{{ product.id }}">
                 <a href="{% url 'product_detail' pk=product.pk %}">
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                    <h4 class="product-name">{{ product.name }}</h4>
-                    <p class="product-price">{{ product.price }} руб.</p>
                 </a>
 
+                <!-- Цена товара -->
+                <p class="product-price">{{ product.price }} руб.</p>
+
+                <!-- Название товара -->
+                <h4 class="product-name">{{ product.name }}</h4>
+
+                <!-- Рейтинг под названием товара -->
+                <div class="product-rating">
+                    <div class="stars-svg">
+                        {% if product.avg_rating %}
+                            {% for i in "12345" %}
+                                <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{% if forloop.counter <= product.avg_rating|floatformat:0 %}#f39c12{% else %}#ccc{% endif %}" width="24" height="24">
+                                    <path d="M12 .587l3.668 7.568L24 9.423l-6 5.854L19.335 24 12 20.202 4.665 24 6 15.277l-6-5.854 8.332-1.268z"/>
+                                </svg>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Если отзывов нет, отображаем серые звезды -->
+                            {% for i in "12345" %}
+                                <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ccc" width="24" height="24">
+                                    <path d="M12 .587l3.668 7.568L24 9.423l-6 5.854L19.335 24 12 20.202 4.665 24 6 15.277l-6-5.854 8.332-1.268z"/>
+                                </svg>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% if product.avg_rating %}
+                        <p>{{ product.avg_rating|floatformat:1 }} / 5</p>
+                    {% endif %}
+                </div>
+
+                <!-- Кнопка добавления в корзину -->
                 {% if product.id in cart_product_ids %}
                     <p id="in-cart-{{ product.id }}">Этот товар уже в корзине</p>
                 {% else %}

@@ -471,3 +471,21 @@ form button:hover {
     background-color: #0056b3; /* Более темный синий цвет при наведении */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Увеличенная тень при наведении */
 }
+
+.stars-svg {
+    display: flex;
+    align-items: center;
+}
+
+.star {
+    margin-right: 2px;
+}
+
+.star:last-child {
+    margin-right: 0;
+}
+
+.stars-svg .star {
+    width: 16px;
+    height: 16px;
+}
