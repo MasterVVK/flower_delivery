@@ -164,7 +164,7 @@ form button:hover {
 .stars-svg {
     display: flex;
     align-items: center;
-    padding-left: 10px
+    padding-left: 10px;
 }
 
 .star {

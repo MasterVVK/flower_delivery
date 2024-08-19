@@ -24,16 +24,12 @@
                     <div class="stars-svg">
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
-                                <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{% if forloop.counter <= product.avg_rating|floatformat:0 %}#f39c12{% else %}#ccc{% endif %}" width="24" height="24">
-                                    <path d="M12 .587l3.668 7.568L24 9.423l-6 5.854L19.335 24 12 20.202 4.665 24 6 15.277l-6-5.854 8.332-1.268z"/>
-                                </svg>
+                                <img src="{% static 'icons/star-icon.svg' %}" class="star" width="24" height="24" style="fill: {% if forloop.counter <= product.avg_rating|floatformat:0 %}#f39c12{% else %}#ccc{% endif %};"/>
                             {% endfor %}
                         {% else %}
                             <!-- Если отзывов нет, отображаем серые звезды -->
                             {% for i in "12345" %}
-                                <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ccc" width="24" height="24">
-                                    <path d="M12 .587l3.668 7.568L24 9.423l-6 5.854L19.335 24 12 20.202 4.665 24 6 15.277l-6-5.854 8.332-1.268z"/>
-                                </svg>
+                                <img src="{% static 'icons/star-icon.svg' %}" class="star" width="24" height="24" style="fill: #ccc;"/>
                             {% endfor %}
                         {% endif %}
                     </div>
