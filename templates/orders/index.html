@@ -21,6 +21,7 @@
 
                 <!-- Рейтинг под названием товара -->
                 <div class="product-rating">
+                    <p class="rating-value">{{ product.avg_rating|floatformat:1 }}</p> <!-- Рейтинг с округлением до десятых -->
                     <div class="stars-svg">
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
@@ -37,9 +38,6 @@
                             {% endfor %}
                         {% endif %}
                     </div>
-                    {% if product.avg_rating %}
-                        <p>{{ product.avg_rating|floatformat:1 }} / 5</p>
-                    {% endif %}
                 </div>
             
 
