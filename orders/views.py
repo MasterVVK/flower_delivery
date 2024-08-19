@@ -59,8 +59,12 @@ def add_to_cart(request, product_id):
         session_key = request.session.session_key or request.session.create()
         cart, created = Cart.objects.get_or_create(session_key=session_key)
 
+    # Убедимся, что добавление товара происходит один раз
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    cart_item.quantity += 1
+    if created:
+        cart_item.quantity = 1
+    else:
+        cart_item.quantity += 1
     cart_item.save()
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -68,6 +72,7 @@ def add_to_cart(request, product_id):
 
     messages.success(request, 'Товар добавлен в корзину.')
     return redirect('cart_detail')
+
 
 def cart_detail(request):
     cart = get_cart(request)
