@@ -231,7 +231,7 @@ form button:hover {
 }
 
 #categories-page .product-name {
-    font-size: 18px;
+    font-size: 16px;
     margin: 10px 0;
     height: 3em; /* Фиксированная высота для заголовков товаров */
     display: flex;

@@ -17,11 +17,11 @@
                 <p class="product-price">{{ product.price }} руб.</p>
 
                 <!-- Название товара -->
-                <h4 class="product-name">{{ product.name }}</h4>
+                <p class="product-name">{{ product.name }}</p>
 
                 <!-- Рейтинг под названием товара -->
                 <div class="product-rating">
-                    <p class="rating-value">{{ product.avg_rating|floatformat:1 }}</p> <!-- Рейтинг с округлением до десятых -->
+                    <span class="rating-value">{{ product.avg_rating|floatformat:1 }}</span> <!-- Рейтинг с округлением до десятых -->
                     <div class="stars-svg">
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
