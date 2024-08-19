@@ -186,6 +186,7 @@ form button:hover {
     font-size: 16px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    width: 100%;
 }
 
 .add-to-cart-button:hover {
@@ -523,3 +524,4 @@ form button:hover {
 .star-rating label:hover ~ label svg {
     fill: #f39c12;
 }
+

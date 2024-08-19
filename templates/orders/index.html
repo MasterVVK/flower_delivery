@@ -38,6 +38,10 @@
                             {% endfor %}
                         {% endif %}
                     </div>
+                    <!-- Добавляем количество отзывов в скобках -->
+                    {% if product.reviews.count > 0 %}
+                        <span class="review-count">({{ product.reviews.count }})</span>
+                    {% endif %}
                 </div>
 
 
