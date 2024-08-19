@@ -178,7 +178,6 @@ form button:hover {
 .stars-svg .star {
     width: 16px;
     height: 16px;
-    fill: currentColor; /* Должен соответствовать цвету fill SVG */
 }
 
 /* Стили для кнопки "В корзину" */

@@ -24,12 +24,16 @@
                     <div class="stars-svg">
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
-                                <img src="{% static 'icons/star-icon.svg' %}" class="star" width="24" height="24" style="fill: {% if forloop.counter <= product.avg_rating|floatformat:0 %}#f39c12{% else %}#ccc{% endif %};"/>
+                                {% if forloop.counter <= product.avg_rating|floatformat:0|add:0 %}
+                                    <img src="{% static 'icons/star-gold.svg' %}" class="star" width="24" height="24"/>
+                                {% else %}
+                                    <img src="{% static 'icons/star-gray.svg' %}" class="star" width="24" height="24"/>
+                                {% endif %}
                             {% endfor %}
                         {% else %}
                             <!-- Если отзывов нет, отображаем серые звезды -->
                             {% for i in "12345" %}
-                                <img src="{% static 'icons/star-icon.svg' %}" class="star" width="24" height="24" style="fill: #ccc;"/>
+                                <img src="{% static 'icons/star-gray.svg' %}" class="star" width="24" height="24"/>
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -37,6 +41,7 @@
                         <p>{{ product.avg_rating|floatformat:1 }} / 5</p>
                     {% endif %}
                 </div>
+            
 
                 <!-- Кнопка добавления в корзину -->
                 {% if product.id in cart_product_ids %}
