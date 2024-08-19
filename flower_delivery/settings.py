@@ -8,13 +8,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, 'config.json')) as config_file:
     config = json.load(config_file)
 
-# Получение секретного ключа из конфигурационного файла, если он отсутствует, используется значение по умолчанию (замените на ваше собственное значение)
+# Секретный ключ и настройки отладки
 SECRET_KEY = config.get('secret_key', 'django-insecure-)m*(m4k=ee(*m8gpbmp2t-(6v)p%w4d%7@w2)@uj@5s3+4_b&(')
-
-# Получение значения DEBUG из конфигурационного файла, если оно отсутствует, используется значение False
 DEBUG = config.get('debug', False)
 
-# Разрешенные хосты, берутся из конфигурационного файла
 ALLOWED_HOSTS = config.get('allowed_hosts', ['fd.vivikey.tech'])
 
 INSTALLED_APPS = [
@@ -107,6 +104,25 @@ REST_FRAMEWORK = {
     ],
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Уровень логирования
+            'class': 'logging.StreamHandler',  # Класс, отвечающий за вывод в консоль
+        },
+    },
+    'loggers': {
+        'my_custom_logger': {
+            'handlers': ['console'],  # Подключаем handler 'console' к нашему кастомному логгеру
+            'level': 'DEBUG',  # Уровень логирования для кастомного логгера
+            'propagate': False,  # Отключаем передачу сообщений другим логгерам
+        },
+    },
+}
+
+
 AIORGRAM_API_TOKEN = config['telegram_token']
 WEBHOOK_URL = config['webhook_url']
 
@@ -117,7 +133,13 @@ SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+# Session management
+SESSION_COOKIE_AGE = 1209600  # 2 недели
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Сессия сохраняется после закрытия браузера
+
+# Redirect settings
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'index'
+LOGIN_URL = 'login'  # URL для страницы логина
 
 AUTH_USER_MODEL = 'users.CustomUser'

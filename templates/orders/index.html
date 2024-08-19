@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div id="main-page">
+    <h2 class="page-title">Все товары</h2>
+    <div id="product-list">
+        {% for product in products %}
+            <div class="product-item" id="product-{{ product.id }}">
+                <a href="{% url 'product_detail' pk=product.pk %}">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                </a>
+
+                <!-- Цена товара -->
+                <p class="product-price">{{ product.price }} руб.</p>
+
+                <!-- Название товара -->
+                <p class="product-name">{{ product.name }}</p>
+
+                <!-- Рейтинг под названием товара -->
+                <div class="product-rating">
+                    <span class="rating-value">{{ product.avg_rating|floatformat:1 }}</span> <!-- Рейтинг с округлением до десятых -->
+                    <div class="stars-svg">
+                        {% if product.avg_rating %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= product.avg_rating|floatformat:0|add:0 %}
+                                    <img src="{% static 'icons/star-gold.svg' %}" class="star" width="16" height="16"/>
+                                {% else %}
+                                    <img src="{% static 'icons/star-gray.svg' %}" class="star" width="16" height="16"/>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <!-- Если отзывов нет, отображаем серые звезды -->
+                            {% for i in "12345" %}
+                                <img src="{% static 'icons/star-gray.svg' %}" class="star" width="16" height="16"/>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- Добавляем количество отзывов в скобках -->
+                    {% if product.reviews.count > 0 %}
+                        <span class="review-count">({{ product.reviews.count }})</span>
+                    {% endif %}
+                </div>
+
+
+                <!-- Кнопка добавления в корзину -->
+                {% if product.id in cart_product_ids %}
+                    <p id="in-cart-{{ product.id }}">Этот товар уже в корзине</p>
+                {% else %}
+                    <button class="add-to-cart-button" data-product-id="{{ product.id }}">В корзину</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <div id="loading" style="text-align: center; margin-top: 20px; display: none;">
+        <p>Загрузка...</p>
+    </div>
+</div>
+
+<script>
+    let page = 2;
+    let isLoading = false;
+
+    function bindAddToCartButtons() {
+        const buttons = document.querySelectorAll('.add-to-cart-button');
+
+        buttons.forEach(button => {
+            button.removeEventListener('click', handleAddToCart);  // Удаление старого обработчика
+            button.addEventListener('click', handleAddToCart);  // Добавление нового обработчика
+        });
+    }
+
+    function handleAddToCart(event) {
+        const button = event.currentTarget;
+        const productId = button.getAttribute('data-product-id');
+
+        fetch("{% url 'add_to_cart' 0 %}".replace('0', productId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'product_id': productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const productDiv = document.getElementById('product-' + productId);
+                const button = productDiv.querySelector('.add-to-cart-button');
+                button.remove();
+                const message = document.createElement('p');
+                message.innerText = 'Этот товар уже в корзине';
+                productDiv.appendChild(message);
+            }
+        })
+        .catch(error => console.error('Ошибка:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindAddToCartButtons();  // Привязываем обработчики при загрузке страницы
+    });
+
+    function loadMoreProducts() {
+        if (isLoading) return;
+        isLoading = true;
+        document.getElementById('loading').style.display = 'block';
+
+        fetch(`/api/products/?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                const productList = document.getElementById('product-list');
+                data.products.forEach(product => {
+                    // Проверяем, есть ли уже продукт с таким id в списке
+                    if (!document.getElementById('product-' + product.id)) {
+                        const productItem = document.createElement('div');
+                        productItem.classList.add('product-item');
+                        productItem.id = 'product-' + product.id;
+                        productItem.innerHTML = `
+                            <a href="${product.url}">
+                                <img src="${product.image}" alt="${product.name}" class="product-image">
+                                <h4 class="product-name">${product.name}</h4>
+                                <p class="product-price">${product.price} руб.</p>
+                            </a>
+                            <button class="add-to-cart-button" data-product-id="${product.id}">В корзину</button>
+                        `;
+                        productList.appendChild(productItem);
+                    }
+                });
+                page++;
+                isLoading = false;
+                document.getElementById('loading').style.display = 'none';
+                if (!data.has_next) {
+                    window.removeEventListener('scroll', handleScroll);
+                }
+                bindAddToCartButtons();  // Привязываем обработчики к новым элементам
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                isLoading = false;
+                document.getElementById('loading').style.display = 'none';
+            });
+    }
+
+    function handleScroll() {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY;
+
+        if (scrolled >= scrollable - 200) {
+            loadMoreProducts();
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+</script>
+{% endblock %}

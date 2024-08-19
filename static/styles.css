@@ -1,5 +1,9 @@
+/* static/styles.css */
+
+/* Общие стили */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
 }
 
 header, footer {
@@ -15,14 +19,509 @@ header a, footer a {
 
 main {
     padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 1200px;
+    margin: 20px auto;
 }
 
 nav ul {
     list-style-type: none;
     padding: 0;
+    text-align: center;
 }
 
 nav ul li {
     display: inline;
     margin: 0 10px;
 }
+
+nav ul li form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li form a {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+nav ul li form a:hover {
+    text-decoration: underline;
+}
+
+form {
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+.errorlist {
+    color: red;
+    margin-bottom: 10px;
+}
+
+.errorlist li {
+    margin-left: 20px;
+}
+
+.field-error {
+    color: red;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+/* Стили для главной страницы */
+#main-page #product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between; /* Для равномерного распределения товаров */
+}
+
+#main-page .product-item {
+    flex: 1 1 calc(25% - 20px); /* Четыре товара в ряд */
+    max-width: calc(25% - 20px); /* Четыре товара в ряд */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fff;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#main-page .product-item img {
+    max-width: 100%;
+    max-height: 200px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+#main-page .product-name {
+    font-size: 16px;
+    margin: 10px 0;
+    height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Выравниваем по левому краю */
+    text-align: left; /* Текст тоже выравнивается по левому краю */
+    padding-left: 10px; /* Добавляем отступ слева */
+    font-weight: normal;
+}
+
+#main-page .product-price {
+    font-size: 18px;
+    color: #007bff;
+    margin-top: auto;
+    text-align: left; /* Текст тоже выравнивается по левому краю */
+    padding-left: 10px; /* Добавляем отступ слева */
+    font-weight: bold;
+}
+
+.product-rating {
+    display: flex;
+    padding-left: 10px; /* Добавляем отступ слева */
+}
+
+.rating-value {
+    margin-right: 4px; /* Отступ между числом и звездами */
+}
+
+.stars-svg {
+    display: flex;
+}
+
+.stars-svg .star {
+    margin-right: 4px; /* Отступ между звездами, если нужно */
+ }
+
+
+/* Стили для кнопки "В корзину" */
+.add-to-cart-button {
+    background-color: #007bff; /* Синий цвет кнопки */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    width: 100%;
+}
+
+.add-to-cart-button:hover {
+    background-color: #0056b3; /* Более темный синий цвет при наведении */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Увеличенная тень при наведении */
+}
+
+/* Стили для страницы категорий */
+#categories-page .product-slider-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+#categories-page .product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    flex: 1;
+    padding: 0 10px;
+}
+
+#categories-page .product-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    width: 200px;
+    text-align: center;
+    background-color: #fff;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+#categories-page .product-item img {
+    max-width: 100%;
+    max-height: 200px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+#categories-page .product-name {
+    font-size: 16px;
+    margin: 10px 0;
+    height: 3em; /* Фиксированная высота для заголовков товаров */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#categories-page .product-price {
+    font-size: 16px;
+    color: #007bff;
+    margin-top: auto;
+}
+
+.scroll-button {
+    background-color: transparent; /* Прозрачный фон */
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 10px;
+}
+
+.scroll-button.left {
+    left: 0;
+}
+
+.scroll-button.right {
+    right: 0;
+}
+
+.icon {
+    width: 36px;
+    height: 36px;
+    filter: invert(80%) sepia(8%) saturate(9%) hue-rotate(190deg) brightness(96%) contrast(89%); /* Светло-серый цвет по умолчанию */
+    transition: filter 0.3s ease;
+}
+
+.scroll-button:hover .icon {
+    filter: invert(34%) sepia(99%) saturate(7499%) hue-rotate(189deg) brightness(97%) contrast(102%); /* Синий цвет при наведении */
+}
+
+/* Стили для таблицы заказа */
+.order-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.order-summary-table th,
+.order-summary-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-summary-table thead tr {
+    background-color: #f2f2f2;
+}
+
+.order-total {
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* Стили для кнопок на странице оформления заказа */
+.order-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.order-button-form {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.confirm-button {
+    background-color: #007bff; /* Синий цвет, как в основном стиле */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #0056b3; /* Более тёмный синий цвет при наведении */
+}
+
+.cancel-button {
+    background-color: #f44336; /* Красный цвет для отмены */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #e53935; /* Более тёмный красный цвет при наведении */
+}
+
+/* Стили для контейнера карточек товаров на странице оформления заказа */
+.order-items-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Стили для карточек товаров */
+.order-item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 15px;
+    max-width: 200px;
+    text-align: center;
+}
+
+/* Стили для изображений товаров внутри карточек */
+.order-item-card .product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Стили для текста внутри карточек */
+.order-item-name {
+    font-size: 16px;
+    font-weight: normal;
+    margin: 10px 0;
+}
+
+.order-item-quantity,
+.order-item-price,
+.order-item-sum {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Адаптивные стили для страницы оформления заказа */
+@media (max-width: 768px) {
+    .order-items-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .order-item-card {
+        max-width: 100%;
+    }
+
+    .confirm-button, .cancel-button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Добавление стилей для управления количеством товара */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.quantity-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.quantity-button:hover {
+    background-color: #0056b3;
+}
+
+.quantity-input {
+    width: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    margin: 0 5px;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+/* Стили для кнопки "Продолжить покупки" */
+.continue-shopping-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.continue-shopping-button:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для таблицы заказов */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.order-table th,
+.order-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-table thead tr {
+    background-color: #f2f2f2;
+}
+
+.order-table th {
+    font-weight: bold;
+    text-align: center;
+}
+
+.order-table td {
+    text-align: center;
+}
+
+.order-table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.order-table a:hover {
+    text-decoration: underline;
+}
+
+/* Стиль для SVG-звездочек */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    font-size: 0; /* Убираем пробелы между инлайновыми элементами */
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.star-rating label svg {
+    width: 24px;
+    height: 24px;
+    fill: #ccc;
+    transition: fill 0.3s;
+}
+
+.star-rating input:checked ~ label svg,
+.star-rating label:hover svg,
+.star-rating label:hover ~ label svg {
+    fill: #f39c12;
+}
+

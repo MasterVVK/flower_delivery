@@ -1,5 +1,3 @@
-<!-- templates/base.html -->
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,16 +5,75 @@
     <title>{% block title %}FlowerDelivery{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script>
+    window.scrollLeft = function scrollLeft(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
+
+        if (container.scrollLeft === 0) {
+            container.prepend(container.lastElementChild);
+            container.scrollBy({ left: scrollAmount, behavior: 'instant' });
+        }
+
+        const onScroll = () => {
+            if (container.scrollLeft <= 0) {
+                container.prepend(container.lastElementChild);
+                container.scrollBy({ left: scrollAmount, behavior: 'instant' });
+                container.removeEventListener('scroll', onScroll);
+            }
+        };
+
+        container.addEventListener('scroll', onScroll);
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    };
+
+    window.scrollRight = function scrollRight(categoryId) {
+        const container = document.getElementById(`category-${categoryId}`);
+        const scrollAmount = 200;
+
+        if (!container) {
+            console.error('Container not found for category:', categoryId);
+            return;
+        }
+
+        const onScroll = () => {
+            if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+                container.append(container.firstElementChild);
+                container.scrollBy({ left: -scrollAmount, behavior: 'instant' });
+                container.removeEventListener('scroll', onScroll);
+            }
+        };
+
+        container.addEventListener('scroll', onScroll);
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    };
+    </script>
 </head>
 <body>
     <header>
-        <h1><a href="{% url 'product_list' %}">FlowerDelivery</a></h1>
+        <h1><a href="{% url 'index' %}">FlowerDelivery</a></h1>
         <nav>
             <ul>
-                <li><a href="{% url 'product_list' %}">Главная</a></li>
+                <li><a href="{% url 'index' %}">Главная</a></li>
+                <li><a href="{% url 'categories' %}">Категории</a></li>
+                <li><a href="{% url 'cart_detail' %}">Корзина</a></li>
                 {% if user.is_authenticated %}
+                    <li><a href="{% url 'order_list' %}">Мои заказы</a></li>
                     <li><a href="{% url 'profile' %}">Профиль</a></li>
-                    <li><a href="{% url 'logout' %}">Выйти</a></li>
+                    <li>
+                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <a href="#" onclick="document.getElementById('logout-form').submit();">Выйти</a>
+                        </form>
+                    </li>
+                    {% if user.role == 'Manager' or user.role == 'Admin' %}
+                        <li><a href="{% url 'manage_products' %}">Администрирование</a></li>
+                    {% endif %}
                 {% else %}
                     <li><a href="{% url 'login' %}">Войти</a></li>
                     <li><a href="{% url 'register' %}">Регистрация</a></li>
@@ -25,6 +82,13 @@
         </nav>
     </header>
     <main>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </main>

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Категории{% endblock %}
+
+{% block content %}
+<div id="categories-page">
+    <h2 class="page-title">Категории</h2>
+    {% for category in categories %}
+        {% if category.products.all %}
+            <h3 class="category-title">{{ category.name }}</h3>
+            <div class="product-slider-container">
+                <button class="scroll-button left" onclick="window.scrollLeft('{{ category.id }}')">
+                    <img src="{% static 'icons/left-arrow.svg' %}" alt="Scroll Left" class="icon">
+                </button>
+                <div class="product-grid" id="category-{{ category.id }}">
+                    {% for product in category.products.all %}
+                        <div class="product-item" id="product-{{ product.id }}">
+                            <a href="{% url 'product_detail' pk=product.pk %}">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                                <h4 class="product-name">{{ product.name }}</h4>
+                                <p class="product-price">{{ product.price }} руб.</p>
+                            </a>
+                            
+                            {% if product.id in cart_product_ids %}
+                                <p id="in-cart-{{ product.id }}">Этот товар уже в корзине</p>
+                            {% else %}
+                                <button class="add-to-cart-button" data-product-id="{{ product.id }}">В корзину</button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="scroll-button right" onclick="window.scrollRight('{{ category.id }}')">
+                    <img src="{% static 'icons/right-arrow.svg' %}" alt="Scroll Right" class="icon">
+                </button>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        bindAddToCartButtons();  // Привязываем обработчики при загрузке страницы
+    });
+
+    function bindAddToCartButtons() {
+        const buttons = document.querySelectorAll('.add-to-cart-button');
+
+        buttons.forEach(button => {
+            button.removeEventListener('click', handleAddToCart);  // Удаление старого обработчика
+            button.addEventListener('click', handleAddToCart, { once: true });  // Добавление нового обработчика
+        });
+    }
+
+    function handleAddToCart(event) {
+        const button = event.currentTarget;
+        const productId = button.getAttribute('data-product-id');
+        
+        // Деактивация кнопки, чтобы предотвратить повторное нажатие
+        button.disabled = true;
+
+        fetch("{% url 'add_to_cart' 0 %}".replace('0', productId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'product_id': productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const productDiv = document.getElementById('product-' + productId);
+                button.remove();
+                const message = document.createElement('p');
+                message.innerText = 'Этот товар уже в корзине';
+                productDiv.appendChild(message);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            button.disabled = false;  // Восстанавливаем кнопку в случае ошибки
+        });
+    }
+</script>
+{% endblock %}

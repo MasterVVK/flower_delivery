@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load orders_filters %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+
+<!-- Контейнер для карточек товаров -->
+<div class="order-items-container">
+    {% for item in cart_items %}
+    <div class="order-item-card">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+        <div class="order-item-details">
+            <h3 class="order-item-name">{{ item.product.name }}</h3>
+            <p class="order-item-quantity">Количество: {{ item.quantity }}</p>
+            <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
+            <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Отображение общей суммы заказа -->
+<p class="order-total">Итого: {{ total }} руб.</p>
+
+<!-- Кнопки подтверждения и отмены -->
+<div class="order-buttons">
+    <form method="post" class="order-button-form">
+        {% csrf_token %}
+        <button type="submit" class="confirm-button">Подтвердить заказ</button>
+    </form>
+
+    <form action="{% url 'cart_detail' %}" method="get" class="order-button-form">
+        <button type="submit" class="cancel-button">Отменить</button>
+    </form>
+</div>
+
+{% endblock %}

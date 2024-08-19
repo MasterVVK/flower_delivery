@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load orders_filters %}
+
+{% block title %}Тестовый фильтр{% endblock %}
+
+{% block content %}
+<h2>Тестовый фильтр</h2>
+<p>Результат умножения 5 на 3: {{ 5|multiply:3 }}</p>
+{% endblock %}

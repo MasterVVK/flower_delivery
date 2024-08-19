@@ -4,9 +4,21 @@
 
 {% block content %}
   <h2>Авторизация</h2>
-  <form method="post">
+  
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  
+  <form method="post" action="{% url 'login' %}?next={{ next }}">
     {% csrf_token %}
     {{ form.as_p }}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
     <button type="submit">Войти</button>
   </form>
 {% endblock %}

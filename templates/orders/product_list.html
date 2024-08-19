@@ -1,14 +1,32 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Каталог продуктов{% endblock %}
 
 {% block content %}
-<h2>Каталог продуктов</h2>
-<ul>
-    {% for product in products %}
-        <li>
-            <a href="{% url 'product_detail' pk=product.pk %}">{{ product.name }}</a> - {{ product.price }} руб.
-        </li>
-    {% endfor %}
-</ul>
+<h2 class="page-title">Каталог продуктов</h2>
+{% for category in categories %}
+    {% if category.products.all %}
+        <h3 class="category-title">{{ category.name }}</h3>
+        <div class="product-slider-container">
+            <button class="scroll-button left" onclick="window.scrollLeft('{{ category.id }}')">
+                <img src="{% static 'icons/left-arrow.svg' %}" alt="Scroll Left" class="icon">
+            </button>
+            <div class="product-grid" id="category-{{ category.id }}">
+                {% for product in category.products.all %}
+                    <div class="product-item">
+                        <a href="{% url 'product_detail' pk=product.pk %}">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                            <h4 class="product-name">{{ product.name }}</h4>
+                            <p class="product-price">{{ product.price }} руб.</p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="scroll-button right" onclick="window.scrollRight('{{ category.id }}')">
+                <img src="{% static 'icons/right-arrow.svg' %}" alt="Scroll Right" class="icon">
+            </button>
+        </div>
+    {% endif %}
+{% endfor %}
 {% endblock %}
