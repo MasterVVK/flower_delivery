@@ -499,3 +499,32 @@ form button:hover {
 .order-table a:hover {
     text-decoration: underline;
 }
+
+/* Стиль для SVG-звездочек */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    font-size: 0; /* Убираем пробелы между инлайновыми элементами */
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.star-rating label svg {
+    width: 24px;
+    height: 24px;
+    fill: #ccc;
+    transition: fill 0.3s;
+}
+
+.star-rating input:checked ~ label svg,
+.star-rating label:hover svg,
+.star-rating label:hover ~ label svg {
+    fill: #f39c12;
+}
