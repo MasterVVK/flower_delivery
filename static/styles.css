@@ -137,19 +137,22 @@ form button:hover {
 }
 
 #main-page .product-name {
-    font-size: 18px;
+    font-size: 16px;
     margin: 10px 0;
-    height: 3em; /* Фиксированная высота для заголовков товаров */
+    height: 3em;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start; /* Выравниваем по левому краю */
+    text-align: left; /* Текст тоже выравнивается по левому краю */
+    padding-left: 10px; /* Добавляем отступ слева */
 }
 
 #main-page .product-price {
-    font-size: 16px;
+    font-size: 18px;
     color: #007bff;
     margin-top: auto;
+    text-align: left; /* Текст тоже выравнивается по левому краю */
+    padding-left: 10px; /* Добавляем отступ слева */
 }
 
 .product-rating {
@@ -159,6 +162,7 @@ form button:hover {
 .stars-svg {
     display: flex;
     align-items: center;
+    padding-left: 10px
 }
 
 .star {
