@@ -159,7 +159,6 @@ form button:hover {
 
 .product-rating {
     display: flex;
-    align-items: center; /* Выровнять элементы по центру вертикально */
     padding-left: 10px; /* Добавляем отступ слева */
 }
 
@@ -173,7 +172,7 @@ form button:hover {
 
 .stars-svg .star {
     margin-right: 4px; /* Отступ между звездами, если нужно */
-}
+ }
 
 
 /* Стили для кнопки "В корзину" */
