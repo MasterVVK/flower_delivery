@@ -274,7 +274,20 @@ def add_review(request, product_id):
 
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
-    return render(request, 'orders/categories.html', {'categories': categories})
+
+    # Проверяем корзину: либо для авторизованного пользователя, либо по сессии
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+    else:
+        session_key = request.session.session_key or request.session.create()
+        cart, _ = Cart.objects.get_or_create(session_key=session_key)
+
+    cart_product_ids = cart.items.values_list('product_id', flat=True)
+
+    return render(request, 'orders/categories.html', {
+        'categories': categories,
+        'cart_product_ids': cart_product_ids,  # Передаем список товаров в корзине
+    })
 
 
 
