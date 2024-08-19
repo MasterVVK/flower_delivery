@@ -145,6 +145,7 @@ form button:hover {
     justify-content: flex-start; /* Выравниваем по левому краю */
     text-align: left; /* Текст тоже выравнивается по левому краю */
     padding-left: 10px; /* Добавляем отступ слева */
+    font-weight: normal;
 }
 
 #main-page .product-price {
@@ -153,6 +154,7 @@ form button:hover {
     margin-top: auto;
     text-align: left; /* Текст тоже выравнивается по левому краю */
     padding-left: 10px; /* Добавляем отступ слева */
+    font-weight: bold;
 }
 
 .product-rating {
