@@ -158,27 +158,23 @@ form button:hover {
 }
 
 .product-rating {
-    margin-bottom: 15px; /* Отступ снизу, чтобы рейтинг не касался кнопки */
+    display: flex;
+    align-items: center; /* Выровнять элементы по центру вертикально */
+    padding-left: 10px; /* Добавляем отступ слева */
+}
+
+.rating-value {
+    margin-right: 4px; /* Отступ между числом и звездами */
 }
 
 .stars-svg {
     display: flex;
-    align-items: center;
-    padding-left: 10px;
-}
-
-.star {
-    margin-right: 2px;
-}
-
-.star:last-child {
-    margin-right: 0;
 }
 
 .stars-svg .star {
-    width: 16px;
-    height: 16px;
+    margin-right: 4px; /* Отступ между звездами, если нужно */
 }
+
 
 /* Стили для кнопки "В корзину" */
 .add-to-cart-button {

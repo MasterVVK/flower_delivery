@@ -26,20 +26,20 @@
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
                                 {% if forloop.counter <= product.avg_rating|floatformat:0|add:0 %}
-                                    <img src="{% static 'icons/star-gold.svg' %}" class="star" width="24" height="24"/>
+                                    <img src="{% static 'icons/star-gold.svg' %}" class="star" width="16" height="16"/>
                                 {% else %}
-                                    <img src="{% static 'icons/star-gray.svg' %}" class="star" width="24" height="24"/>
+                                    <img src="{% static 'icons/star-gray.svg' %}" class="star" width="16" height="16"/>
                                 {% endif %}
                             {% endfor %}
                         {% else %}
                             <!-- Если отзывов нет, отображаем серые звезды -->
                             {% for i in "12345" %}
-                                <img src="{% static 'icons/star-gray.svg' %}" class="star" width="24" height="24"/>
+                                <img src="{% static 'icons/star-gray.svg' %}" class="star" width="16" height="16"/>
                             {% endfor %}
                         {% endif %}
                     </div>
                 </div>
-            
+
 
                 <!-- Кнопка добавления в корзину -->
                 {% if product.id in cart_product_ids %}
