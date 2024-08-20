@@ -35,6 +35,7 @@ class Product(models.Model):
     price = models.DecimalField(_("Цена"), max_digits=10, decimal_places=2)
     image = models.ImageField(_("Изображение"), upload_to='products/')
     category = models.ForeignKey(ProductCategory, verbose_name=_("Категория"), on_delete=models.CASCADE, related_name='products')
+    description = models.TextField(_("Описание"), blank=True, null=True)
 
     def __str__(self):
         return self.name
