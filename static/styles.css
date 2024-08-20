@@ -526,3 +526,18 @@ form button:hover {
     fill: #f39c12;
 }
 
+
+.product-detail {
+    display: flex;
+    align-items: flex-start; /* Выравнивание по верхнему краю */
+}
+
+.product-image {
+    max-width: 300px;
+    margin-right: 20px; /* Отступ справа от изображения */
+}
+
+.product-info {
+    max-width: 600px; /* Ширина для блока с описанием */
+}
+

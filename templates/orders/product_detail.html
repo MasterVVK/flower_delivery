@@ -3,10 +3,15 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<h2>{{ product.name }}</h2>
-    <p>{{ product.description }}</p>
-<p>Цена: {{ product.price }} руб.</p>
-<img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 400px; max-width: 400px;">
+<div class="product-detail">
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+    <div class="product-info">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p> <!-- Описание справа от изображения -->
+        <p>Цена: {{ product.price }} руб.</p>
+    </div>
+</div>
+
 <h3>Отзывы</h3>
 <ul>
     {% for review in reviews %}
@@ -15,12 +20,14 @@
         </li>
     {% endfor %}
 </ul>
+
 <h3>Добавить отзыв</h3>
 <form method="post" action="{% url 'add_review' product_id=product.id %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Добавить</button>
 </form>
+
 <h3>Добавить в корзину</h3>
 <form method="post" action="{% url 'add_to_cart' product.id %}">
     {% csrf_token %}

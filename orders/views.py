@@ -136,19 +136,42 @@ def order_detail(request, pk):
 def index(request):
     products = Product.objects.all()
 
-    # Проверяем корзину: либо для авторизованного пользователя, либо по сессии
     if request.user.is_authenticated:
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+        carts = Cart.objects.filter(user=request.user)
+        session_key = None  # Определяем переменную, чтобы избежать ошибки
     else:
-        session_key = request.session.session_key or request.session.create()
-        cart, _ = Cart.objects.get_or_create(session_key=session_key)
+        # Проверка на наличие сессионного ключа
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()  # Создаем новую сессию, если ее нет
+            session_key = request.session.session_key
+
+        carts = Cart.objects.filter(session_key=session_key)
+
+    if carts.exists():
+        cart = carts.first()  # Берем первую корзину, если их несколько
+        if carts.count() > 1:
+            # Объединяем корзины, если их больше одной
+            for extra_cart in carts[1:]:
+                for item in extra_cart.items.all():
+                    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+                    if not created:
+                        cart_item.quantity += item.quantity
+                    cart_item.save()
+                extra_cart.delete()  # Удаляем лишние корзины
+    else:
+        cart = Cart.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key
+        )
 
     cart_product_ids = cart.items.values_list('product_id', flat=True)
 
     return render(request, 'orders/index.html', {
         'products': products,
-        'cart_product_ids': cart_product_ids,  # Передаем список товаров в корзине
+        'cart_product_ids': cart_product_ids,
     })
+
 
 def load_more_products(request):
     page = request.GET.get('page', 1)
