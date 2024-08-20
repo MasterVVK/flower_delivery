@@ -5,9 +5,9 @@
 
 {% block content %}
 <h2>Корзина</h2>
-    
+
 {% if cart_items %}
- 
+
     <div class="order-items-container">
         {% for item in cart_items %}
         <div class="order-item-card">
@@ -40,7 +40,7 @@
         </form>
         <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
     </div>
-    
+
 {% else %}
     <p class="empty-cart-message">Вы еще не положили товар в корзину.</p>
     <div class="order-buttons">
@@ -50,7 +50,7 @@
     </div>
 
 {% endif %}
-    
+
 
 <script>
 document.querySelectorAll('.quantity-button').forEach(button => {
