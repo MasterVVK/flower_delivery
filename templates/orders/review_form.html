@@ -1,9 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}Добавить отзыв{% endblock %}
+{% block title %}
+{% if is_editing %}
+    Редактировать отзыв
+{% else %}
+    Добавить отзыв
+{% endif %}
+{% endblock %}
 
 {% block content %}
-<h2>Добавить отзыв для {{ product.name }}</h2>
+<h2>
+{% if is_editing %}
+    Редактировать отзыв для {{ product.name }}
+{% else %}
+    Добавить отзыв для {{ product.name }}
+{% endif %}
+</h2>
 <form method="post">
     {% csrf_token %}
     <div class="rating">
@@ -23,6 +35,12 @@
         <label for="id_comment">Комментарий:</label>
         {{ form.comment }}
     </div>
-    <button type="submit">Добавить отзыв</button>
+    <button type="submit">
+    {% if is_editing %}
+        Редактировать отзыв
+    {% else %}
+        Добавить отзыв
+    {% endif %}
+    </button>
 </form>
 {% endblock %}

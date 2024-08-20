@@ -19,6 +19,15 @@
             {% csrf_token %}
             <button type="submit" class="add-to-cart-button">Добавить в корзину</button>
         </form>
+
+        <!-- Кнопка для добавления или редактирования отзыва -->
+        <div class="review-action">
+            {% if user_review %}
+                <a href="{% url 'add_review' product.id %}" class="btn btn-primary">Редактировать отзыв</a>
+            {% else %}
+                <a href="{% url 'add_review' product.id %}" class="btn btn-primary">Добавить отзыв</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 
@@ -35,12 +44,5 @@
         <p>Отзывов пока нет. Будьте первым, кто оставит отзыв!</p>
     {% endif %}
 </div>
-
-<!-- Форма добавления отзыва -->
-<form method="post" action="{% url 'add_review' product_id=product.id %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="submit-review-button">Отправить отзыв</button>
-</form>
 
 {% endblock %}

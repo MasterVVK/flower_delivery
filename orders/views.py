@@ -269,7 +269,33 @@ def product_list(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     reviews = Review.objects.filter(product=product)
-    return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
+    user_review = None
+
+    # Проверка существующего отзыва пользователя, только если пользователь авторизован
+    if request.user.is_authenticated:
+        try:
+            user_review = Review.objects.get(product=product, user=request.user)
+        except Review.DoesNotExist:
+            user_review = None
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=user_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.product = product
+            review.save()
+            return redirect('product_detail', pk=product.pk)
+    else:
+        form = ReviewForm(instance=user_review)
+
+    return render(request, 'orders/product_detail.html', {
+        'product': product,
+        'reviews': reviews,
+        'form': form,
+        'user_review': user_review,
+    })
+
 
 @login_required
 def order_create(request, product_id):
@@ -280,11 +306,19 @@ def order_create(request, product_id):
         return redirect('order_detail', pk=order.pk)
     return render(request, 'orders/order_form.html', {'product': product})
 
+
 @login_required
 def add_review(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    try:
+        review = Review.objects.get(user=request.user, product=product)
+        is_editing = True
+    except Review.DoesNotExist:
+        review = None
+        is_editing = False
+
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
@@ -292,8 +326,13 @@ def add_review(request, product_id):
             review.save()
             return redirect('product_detail', pk=product_id)
     else:
-        form = ReviewForm()
-    return render(request, 'orders/review_form.html', {'form': form, 'product': product})
+        form = ReviewForm(instance=review)
+
+    return render(request, 'orders/review_form.html', {
+        'form': form,
+        'product': product,
+        'is_editing': is_editing,
+    })
 
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
