@@ -4,7 +4,8 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from aiohttp import web
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import Message
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from asgiref.sync import sync_to_async
 from django.db.models import Sum, F
@@ -40,14 +41,11 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher()  # Создаем диспетчер без аргументов
-
-# Добавляем бота в диспетчер
-dp['bot'] = bot
+dp = Dispatcher(bot)
 
 # Обработчик команды /start
-@dp.message(F.text == '/start')
-async def start(message: types.Message):
+@dp.message_handler(commands=['start'])
+async def start(message: Message):
     await message.answer("Привет! Я бот для управления заказами. Вы будете получать уведомления о новых заказах.\n"
                          "Используйте команды:\n"
                          "/sales_report - Отчет о продажах\n"
@@ -55,8 +53,8 @@ async def start(message: types.Message):
                          "/product_popularity - Популярность продуктов")
 
 # Команда /sales_report для получения отчета о продажах
-@dp.message(F.text == '/sales_report')
-async def sales_report(message: types.Message):
+@dp.message_handler(commands=['sales_report'])
+async def sales_report(message: Message):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=7)
 
@@ -85,8 +83,8 @@ async def sales_report(message: types.Message):
     await message.answer(report)
 
 # Команда /user_activity для получения отчета об активности пользователей
-@dp.message(F.text == '/user_activity')
-async def user_activity(message: types.Message):
+@dp.message_handler(commands=['user_activity'])
+async def user_activity(message: Message):
     start_date = datetime.now() - timedelta(days=7)
     recent_reviews = await sync_to_async(lambda: list(Review.objects.filter(created_at__gte=start_date)))()
     total_reviews = len(recent_reviews)
@@ -97,8 +95,8 @@ async def user_activity(message: types.Message):
     await message.answer(report)
 
 # Команда /product_popularity для получения отчета о популярности продуктов
-@dp.message(F.text == '/product_popularity')
-async def product_popularity(message: types.Message):
+@dp.message_handler(commands=['product_popularity'])
+async def product_popularity(message: Message):
     popular_products = await sync_to_async(lambda: list(Product.objects.annotate(total_sales=Sum('orderproduct__quantity')).order_by('-total_sales')[:5]))()
 
     if not popular_products:
