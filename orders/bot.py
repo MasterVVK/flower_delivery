@@ -7,9 +7,9 @@ from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import Message
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from asgiref.sync import sync_to_async
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Count
 
 # Устанавливаем текущий рабочий каталог на уровень выше, если это не так
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -50,7 +50,8 @@ async def start(message: Message):
                          "Используйте команды:\n"
                          "/sales_report - Отчет о продажах\n"
                          "/user_activity - Активность пользователей\n"
-                         "/product_popularity - Популярность продуктов")
+                         "/product_popularity - Популярность продуктов\n"
+                         "/order_status_report - Отчет по статусам заказов")
 
 dp.message.register(start, Command("start"))
 
@@ -59,21 +60,18 @@ async def sales_report(message: Message):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=7)
 
-    # Используем sync_to_async для обращения к базе данных
     recent_orders = await sync_to_async(lambda: list(Order.objects.filter(created_at__range=[start_date, end_date])))()
 
     if not recent_orders:
         await message.answer("За последние 7 дней не было сделано ни одного заказа.")
         return
 
-    # Собираем все значения в список, используя list comprehension
     total_sales_list = [
         await sync_to_async(lambda: order.orderproduct_set.aggregate(
             total=Sum(F('quantity') * F('product__price'))
-        )['total'])() or 0 for order in recent_orders  # Заменяем None на 0
+        )['total'])() or 0 for order in recent_orders
     ]
 
-    # Теперь используем sum() для суммирования всех значений
     total_sales = sum(total_sales_list)
     total_orders = len(recent_orders)
 
@@ -114,6 +112,31 @@ async def product_popularity(message: Message):
 
 dp.message.register(product_popularity, Command("product_popularity"))
 
+# Команда /order_status_report для получения отчета по статусам заказов
+async def order_status_report(message: Message):
+    # Получаем количество заказов по каждому статусу за последние 7 дней
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)
+
+    status_counts = await sync_to_async(lambda: Order.objects.filter(
+        created_at__range=[start_date, end_date]
+    ).values('status').annotate(count=Count('status')).order_by('status'))()
+
+    status_map = {
+        'P': 'В ожидании',
+        'C': 'Завершен',
+        'F': 'Неудачно',
+        'X': 'Отменен'
+    }
+
+    report = "Отчет по статусам заказов за последние 7 дней:\n"
+    for status in status_counts:
+        report += f"{status_map.get(status['status'], 'Неизвестно')}: {status['count']} заказов\n"
+
+    await message.answer(report)
+
+dp.message.register(order_status_report, Command("order_status_report"))
+
 # Обработчик запуска aiohttp
 async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL)
@@ -128,16 +151,13 @@ async def main():
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
 
-    # Регистрация хэндлеров для webhook
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
 
-    # Запуск aiohttp приложения
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 5000)
     await site.start()
 
-    # Ожидание завершения процесса
     await asyncio.Event().wait()
 
 if __name__ == '__main__':
