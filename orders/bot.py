@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
-from aiogram.dispatcher.webhook import get_new_configured_app
 from asgiref.sync import sync_to_async
 from django.db.models import Sum, F
 
@@ -41,10 +40,9 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Обработчик команды /start
-@dp.message_handler(commands=['start'])
 async def start(message: Message):
     await message.answer("Привет! Я бот для управления заказами. Вы будете получать уведомления о новых заказах.\n"
                          "Используйте команды:\n"
@@ -52,8 +50,9 @@ async def start(message: Message):
                          "/user_activity - Активность пользователей\n"
                          "/product_popularity - Популярность продуктов")
 
+dp.message.register(start, commands=["start"])
+
 # Команда /sales_report для получения отчета о продажах
-@dp.message_handler(commands=['sales_report'])
 async def sales_report(message: Message):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=7)
@@ -82,8 +81,9 @@ async def sales_report(message: Message):
 
     await message.answer(report)
 
+dp.message.register(sales_report, commands=["sales_report"])
+
 # Команда /user_activity для получения отчета об активности пользователей
-@dp.message_handler(commands=['user_activity'])
 async def user_activity(message: Message):
     start_date = datetime.now() - timedelta(days=7)
     recent_reviews = await sync_to_async(lambda: list(Review.objects.filter(created_at__gte=start_date)))()
@@ -94,8 +94,9 @@ async def user_activity(message: Message):
 
     await message.answer(report)
 
+dp.message.register(user_activity, commands=["user_activity"])
+
 # Команда /product_popularity для получения отчета о популярности продуктов
-@dp.message_handler(commands=['product_popularity'])
 async def product_popularity(message: Message):
     popular_products = await sync_to_async(lambda: list(Product.objects.annotate(total_sales=Sum('orderproduct__quantity')).order_by('-total_sales')[:5]))()
 
@@ -109,14 +110,25 @@ async def product_popularity(message: Message):
 
     await message.answer(report)
 
+dp.message.register(product_popularity, commands=["product_popularity"])
+
 # Обработчик запуска aiohttp
-async def on_startup(dp):
+async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL)
 
+# Обработчик остановки aiohttp
+async def on_shutdown(app):
+    await bot.delete_webhook()
+
 # Настройка приложения aiohttp
-app = get_new_configured_app(dispatcher=dp, path=WEBHOOK_PATH)
+app = web.Application()
 app.on_startup.append(on_startup)
+app.on_shutdown.append(on_shutdown)
+
+# Регистрация обработчиков и маршрутов для aiohttp
+dp.setup(app)
 
 # Запуск приложения
 if __name__ == '__main__':
-    web.run_app(app, host='0.0.0.0', port=5000)
+    async with dp:
+        web.run_app(app, host='0.0.0.0', port=5000)
