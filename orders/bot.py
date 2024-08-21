@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiogram.dispatcher.webhook import get_new_configured_app
 from asgiref.sync import sync_to_async
 from django.db.models import Sum, F
 
@@ -39,9 +39,9 @@ WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 # Настройка логгирования
 logging.basicConfig(level=logging.INFO)
 
-# Инициализация бота
+# Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
 # Обработчик команды /start
 @dp.message_handler(commands=['start'])
@@ -110,22 +110,13 @@ async def product_popularity(message: Message):
     await message.answer(report)
 
 # Обработчик запуска aiohttp
-async def on_startup(app):
+async def on_startup(dp):
     await bot.set_webhook(WEBHOOK_URL)
 
-# Обработчик остановки aiohttp
-async def on_shutdown(app):
-    await bot.delete_webhook()
-
 # Настройка приложения aiohttp
-app = web.Application()
+app = get_new_configured_app(dispatcher=dp, path=WEBHOOK_PATH)
 app.on_startup.append(on_startup)
-app.on_shutdown.append(on_shutdown)
-
-# Регистрация SimpleRequestHandler
-SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
 
 # Запуск приложения
 if __name__ == '__main__':
-    setup_application(app, dp)
     web.run_app(app, host='0.0.0.0', port=5000)
