@@ -385,3 +385,17 @@ def cancel_order(request, order_id):
     else:
         messages.error(request, 'Этот заказ не может быть отменен.')
     return redirect('order_list')
+
+def test_stars(request):
+    test_ratings = [4.5, 3.3, 2.7, 5.0, 1.5]
+    ratings_data = []
+
+    for rating in test_ratings:
+        width_percentage = rating * 20  # Вычисляем ширину в процентах
+        ratings_data.append({
+            'rating': rating,
+            'width_percentage': width_percentage,
+        })
+
+    return render(request, 'orders/test_stars.html', {'ratings_data': ratings_data})
+

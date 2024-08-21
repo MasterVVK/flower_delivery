@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Тестирование звездного рейтинга{% endblock %}
+
+{% block content %}
+<div id="main-page">
+    <h2 class="page-title">Тестирование звездного рейтинга</h2>
+
+    <style>
+        .stars-svg {
+            display: flex;
+            align-items: center;
+            position: relative;
+            width: 80px; /* 5 звезд по 16px */
+            height: 16px;
+        }
+        .stars-background, .stars-foreground {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: repeat-x;
+        }
+        .stars-background {
+            background-image: url("{% static 'icons/star-gray.svg' %}");
+        }
+        .stars-foreground {
+            background-image: url("{% static 'icons/star-gold.svg' %}");
+            width: 0%; /* Динамически изменяемый процент */
+            overflow: hidden;
+        }
+    </style>
+
+    {% for data in ratings_data %}
+    <div class="product-item">
+        <p class="product-name">Продукт с рейтингом {{ data.rating }}</p>
+        <div class="product-rating">
+            <span class="rating-value">{{ data.rating }}</span>
+            <div class="stars-svg">
+                <div class="stars-background"></div>
+                <div class="stars-foreground" style="width: {{ data.width_percentage }}%;"></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
