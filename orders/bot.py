@@ -70,7 +70,7 @@ async def sales_report(message: Message):
     total_sales_list = [
         await sync_to_async(lambda: order.orderproduct_set.aggregate(
             total=Sum(F('quantity') * F('product__price'))
-        )['total'])() for order in recent_orders
+        )['total'])() or 0 for order in recent_orders  # Заменяем None на 0
     ]
 
     # Теперь используем sum() для суммирования всех значений
