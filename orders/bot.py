@@ -2,10 +2,11 @@ import json
 import os
 import logging
 import sys
+from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-from datetime import timedelta,datetime
+from asgiref.sync import sync_to_async
 
 # Устанавливаем текущий рабочий каталог на уровень выше, если это не так
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +19,7 @@ import django
 django.setup()
 
 # Импорт моделей Django
-from orders.models import Product, Order, OrderProduct
+from orders.models import Product, Order, OrderProduct, Review
 
 # Загрузка конфигурации
 config_path = os.path.join(parent_path, 'config.json')
@@ -55,19 +56,18 @@ async def start(message: types.Message):
 # Команда /sales_report для получения отчета о продажах
 @dp.message(F.text == '/sales_report')
 async def sales_report(message: types.Message):
-    # Рассчитываем даты для отчета за последние 7 дней
     end_date = datetime.now()
     start_date = end_date - timedelta(days=7)
 
-    # Получаем заказы за последние 7 дней
-    recent_orders = Order.objects.filter(created_at__range=[start_date, end_date])
+    # Используем sync_to_async для обращения к базе данных
+    recent_orders = await sync_to_async(lambda: list(Order.objects.filter(created_at__range=[start_date, end_date])))()
 
-    if not recent_orders.exists():
+    if not recent_orders:
         await message.answer("За последние 7 дней не было сделано ни одного заказа.")
         return
 
-    total_sales = sum(order.orderproduct_set.aggregate(sum('quantity') * sum('product__price'))['sum'] for order in recent_orders)
-    total_orders = recent_orders.count()
+    total_sales = sum(await sync_to_async(lambda: order.orderproduct_set.aggregate(sum('quantity') * sum('product__price'))['sum'])() for order in recent_orders)
+    total_orders = len(recent_orders)
 
     report = (f"Отчет о продажах за последние 7 дней:\n"
               f"Общая сумма продаж: {total_sales:.2f} руб.\n"
@@ -78,10 +78,9 @@ async def sales_report(message: types.Message):
 # Команда /user_activity для получения отчета об активности пользователей
 @dp.message(F.text == '/user_activity')
 async def user_activity(message: types.Message):
-    # Вычисляем количество новых отзывов за последние 7 дней
     start_date = datetime.now() - timedelta(days=7)
-    recent_reviews = Review.objects.filter(created_at__gte=start_date)
-    total_reviews = recent_reviews.count()
+    recent_reviews = await sync_to_async(lambda: list(Review.objects.filter(created_at__gte=start_date)))()
+    total_reviews = len(recent_reviews)
 
     report = (f"Отчет об активности пользователей за последние 7 дней:\n"
               f"Количество новых отзывов: {total_reviews}\n")
@@ -91,10 +90,9 @@ async def user_activity(message: types.Message):
 # Команда /product_popularity для получения отчета о популярности продуктов
 @dp.message(F.text == '/product_popularity')
 async def product_popularity(message: types.Message):
-    # Получаем продукты, отсортированные по количеству продаж за все время
-    popular_products = Product.objects.annotate(total_sales=Sum('orderproduct__quantity')).order_by('-total_sales')[:5]
+    popular_products = await sync_to_async(lambda: list(Product.objects.annotate(total_sales=Sum('orderproduct__quantity')).order_by('-total_sales')[:5]))()
 
-    if not popular_products.exists():
+    if not popular_products:
         await message.answer("Не удалось найти популярные продукты.")
         return
 
