@@ -114,13 +114,12 @@ dp.message.register(product_popularity, Command("product_popularity"))
 
 # Команда /order_status_report для получения отчета по статусам заказов
 async def order_status_report(message: Message):
-    # Получаем количество заказов по каждому статусу за последние 7 дней
     end_date = datetime.now()
     start_date = end_date - timedelta(days=7)
 
-    status_counts = await sync_to_async(lambda: Order.objects.filter(
+    status_counts = await sync_to_async(lambda: list(Order.objects.filter(
         created_at__range=[start_date, end_date]
-    ).values('status').annotate(count=Count('status')).order_by('status'))()
+    ).values('status').annotate(count=Count('status')).order_by('status')))()
 
     status_map = {
         'P': 'В ожидании',
