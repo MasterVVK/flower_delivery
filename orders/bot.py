@@ -136,6 +136,13 @@ async def order_status_report(message: Message):
 
 dp.message.register(order_status_report, Command("order_status_report"))
 
+# Команда /get_id для получения ID чата
+async def get_id(message: Message):
+    chat_id = message.chat.id
+    await message.answer(f"ID этого чата: {chat_id}")
+
+dp.message.register(get_id, Command("get_id"))
+
 # Обработчик запуска aiohttp
 async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL)
