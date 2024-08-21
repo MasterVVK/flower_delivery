@@ -7,6 +7,7 @@ from aiohttp import web
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from asgiref.sync import sync_to_async
+from django.db.models import Sum, F
 
 # Устанавливаем текущий рабочий каталог на уровень выше, если это не так
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +20,7 @@ import django
 django.setup()
 
 # Импорт моделей Django
-from orders.models import Product, Order, OrderProduct, Review
+from orders.models import Product, Order, Review
 
 # Загрузка конфигурации
 config_path = os.path.join(parent_path, 'config.json')
@@ -66,7 +67,15 @@ async def sales_report(message: types.Message):
         await message.answer("За последние 7 дней не было сделано ни одного заказа.")
         return
 
-    total_sales = sum(await sync_to_async(lambda: order.orderproduct_set.aggregate(sum('quantity') * sum('product__price'))['sum'])() for order in recent_orders)
+    # Собираем все значения в список, используя list comprehension
+    total_sales_list = [
+        await sync_to_async(lambda: order.orderproduct_set.aggregate(
+            total=Sum(F('quantity') * F('product__price'))
+        )['total'])() for order in recent_orders
+    ]
+
+    # Теперь используем sum() для суммирования всех значений
+    total_sales = sum(total_sales_list)
     total_orders = len(recent_orders)
 
     report = (f"Отчет о продажах за последние 7 дней:\n"
