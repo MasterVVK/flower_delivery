@@ -6,39 +6,51 @@
 {% block content %}
 <h2>Корзина</h2>
 
-<div class="order-items-container">
-    {% for item in cart_items %}
-    <div class="order-item-card">
-        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
-        <div class="order-item-details">
-            <h3 class="order-item-name">{{ item.product.name }}</h3>
-            <form method="post" action="{% url 'update_cart_item' item.product.id %}" class="quantity-form">
-                {% csrf_token %}
-                <div class="quantity-controls">
-                    <button type="button" class="quantity-button decrease" data-action="decrease">-</button>
-                    <input type="text" name="quantity" value="{{ item.quantity }}" readonly class="quantity-input">
-                    <button type="button" class="quantity-button increase" data-action="increase">+</button>
-                </div>
-            </form>
-            <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
-            <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
-            <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
-                {% csrf_token %}
-                <button type="submit" class="cancel-button">Удалить</button>
-            </form>
+{% if cart_items %}
+
+    <div class="order-items-container">
+        {% for item in cart_items %}
+        <div class="order-item-card">
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image">
+            <div class="order-item-details">
+                <h3 class="order-item-name">{{ item.product.name }}</h3>
+                <form method="post" action="{% url 'update_cart_item' item.product.id %}" class="quantity-form">
+                    {% csrf_token %}
+                    <div class="quantity-controls">
+                        <button type="button" class="quantity-button decrease" data-action="decrease">-</button>
+                        <input type="text" name="quantity" value="{{ item.quantity }}" readonly class="quantity-input">
+                        <button type="button" class="quantity-button increase" data-action="increase">+</button>
+                    </div>
+                </form>
+                <p class="order-item-price">Цена за единицу: {{ item.product.price }} руб.</p>
+                <p class="order-item-sum">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</p>
+                <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="cancel-button">Удалить</button>
+                </form>
+            </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-<p class="order-total">Итого: {{ total }} руб.</p>
+    <p class="order-total">Итого: {{ total }} руб.</p>
+    <div class="order-buttons">
+        <form action="{% url 'index' %}" method="get" class="order-button-form">
+            <button type="submit" class="continue-shopping-button">Продолжить покупки</button>
+        </form>
+        <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
+    </div>
 
-<div class="order-buttons">
-    <form action="{% url 'index' %}" method="get" class="order-button-form">
-        <button type="submit" class="continue-shopping-button">Продолжить покупки</button>
-    </form>
-    <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
-</div>
+{% else %}
+    <p class="empty-cart-message">Вы еще не положили товар в корзину.</p>
+    <div class="order-buttons">
+        <form action="{% url 'index' %}" method="get" class="order-button-form">
+            <button type="submit" class="continue-shopping-button">Продолжить покупки</button>
+        </form>
+    </div>
+
+{% endif %}
+
 
 <script>
 document.querySelectorAll('.quantity-button').forEach(button => {

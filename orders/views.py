@@ -136,19 +136,42 @@ def order_detail(request, pk):
 def index(request):
     products = Product.objects.all()
 
-    # Проверяем корзину: либо для авторизованного пользователя, либо по сессии
     if request.user.is_authenticated:
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+        carts = Cart.objects.filter(user=request.user)
+        session_key = None  # Определяем переменную, чтобы избежать ошибки
     else:
-        session_key = request.session.session_key or request.session.create()
-        cart, _ = Cart.objects.get_or_create(session_key=session_key)
+        # Проверка на наличие сессионного ключа
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()  # Создаем новую сессию, если ее нет
+            session_key = request.session.session_key
+
+        carts = Cart.objects.filter(session_key=session_key)
+
+    if carts.exists():
+        cart = carts.first()  # Берем первую корзину, если их несколько
+        if carts.count() > 1:
+            # Объединяем корзины, если их больше одной
+            for extra_cart in carts[1:]:
+                for item in extra_cart.items.all():
+                    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+                    if not created:
+                        cart_item.quantity += item.quantity
+                    cart_item.save()
+                extra_cart.delete()  # Удаляем лишние корзины
+    else:
+        cart = Cart.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key
+        )
 
     cart_product_ids = cart.items.values_list('product_id', flat=True)
 
     return render(request, 'orders/index.html', {
         'products': products,
-        'cart_product_ids': cart_product_ids,  # Передаем список товаров в корзине
+        'cart_product_ids': cart_product_ids,
     })
+
 
 def load_more_products(request):
     page = request.GET.get('page', 1)
@@ -246,7 +269,33 @@ def product_list(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     reviews = Review.objects.filter(product=product)
-    return render(request, 'orders/product_detail.html', {'product': product, 'reviews': reviews})
+    user_review = None
+
+    # Проверка существующего отзыва пользователя, только если пользователь авторизован
+    if request.user.is_authenticated:
+        try:
+            user_review = Review.objects.get(product=product, user=request.user)
+        except Review.DoesNotExist:
+            user_review = None
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=user_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.product = product
+            review.save()
+            return redirect('product_detail', pk=product.pk)
+    else:
+        form = ReviewForm(instance=user_review)
+
+    return render(request, 'orders/product_detail.html', {
+        'product': product,
+        'reviews': reviews,
+        'form': form,
+        'user_review': user_review,
+    })
+
 
 @login_required
 def order_create(request, product_id):
@@ -257,11 +306,19 @@ def order_create(request, product_id):
         return redirect('order_detail', pk=order.pk)
     return render(request, 'orders/order_form.html', {'product': product})
 
+
 @login_required
 def add_review(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    try:
+        review = Review.objects.get(user=request.user, product=product)
+        is_editing = True
+    except Review.DoesNotExist:
+        review = None
+        is_editing = False
+
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
@@ -269,8 +326,13 @@ def add_review(request, product_id):
             review.save()
             return redirect('product_detail', pk=product_id)
     else:
-        form = ReviewForm()
-    return render(request, 'orders/review_form.html', {'form': form, 'product': product})
+        form = ReviewForm(instance=review)
+
+    return render(request, 'orders/review_form.html', {
+        'form': form,
+        'product': product,
+        'is_editing': is_editing,
+    })
 
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
@@ -323,3 +385,17 @@ def cancel_order(request, order_id):
     else:
         messages.error(request, 'Этот заказ не может быть отменен.')
     return redirect('order_list')
+
+def test_stars(request):
+    test_ratings = [4.5, 3.3, 2.7, 5.0, 1.5]
+    ratings_data = []
+
+    for rating in test_ratings:
+        width_percentage = rating * 20  # Вычисляем ширину в процентах
+        ratings_data.append({
+            'rating': rating,
+            'width_percentage': width_percentage,
+        })
+
+    return render(request, 'orders/test_stars.html', {'ratings_data': ratings_data})
+

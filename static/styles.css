@@ -187,6 +187,7 @@ form button:hover {
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
     width: 100%;
+    height: 3.5em;
 }
 
 .add-to-cart-button:hover {
@@ -308,7 +309,7 @@ form button:hover {
 /* Стили для кнопок на странице оформления заказа */
 .order-buttons {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .order-button-form {
@@ -525,3 +526,86 @@ form button:hover {
     fill: #f39c12;
 }
 
+
+.product-page {
+    display: flex;
+    gap: 30px; /* Расстояние между изображением и блоком с описанием */
+    align-items: flex-start; /* Выравнивание по верхнему краю */
+}
+
+.product-image {
+    flex: 1;
+    max-width: 50%; /* Ограничение максимальной ширины изображения */
+}
+
+.product-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Держим контент сверху */
+}
+
+.product-info h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.product-info p {
+    margin-bottom: 20px;
+}
+
+.product-price {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.add-to-cart-button {
+    padding: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    text-align: center;
+    width: 100%;
+}
+
+.add-to-cart-button:hover {
+    background-color: #0056b3;
+}
+
+.submit-review-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.submit-review-button:hover {
+    background-color: #0056b3;
+}
+
+.reviews {
+    margin-top: 40px;
+}
+
+.review-item {
+    background-color: #f8f8f8;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

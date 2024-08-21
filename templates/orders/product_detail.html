@@ -3,26 +3,46 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<h2>{{ product.name }}</h2>
-<p>Цена: {{ product.price }} руб.</p>
-<img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 400px; max-width: 400px;">
+<div class="product-page">
+    <!-- Левая часть: изображение продукта -->
+    <div class="product-image">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+    </div>
+
+    <!-- Правая часть: описание и кнопка добавления в корзину -->
+    <div class="product-info">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p> <!-- Описание продукта -->
+        <p class="product-price">Цена: {{ product.price }} руб.</p>
+        
+        <form method="post" action="{% url 'add_to_cart' product.id %}">
+            {% csrf_token %}
+            <button type="submit" class="add-to-cart-button">Добавить в корзину</button>
+        </form>
+
+        <!-- Кнопка для добавления или редактирования отзыва -->
+        <div class="review-action">
+            {% if user_review %}
+                <a href="{% url 'add_review' product.id %}" class="btn btn-primary">Редактировать отзыв</a>
+            {% else %}
+                <a href="{% url 'add_review' product.id %}" class="btn btn-primary">Добавить отзыв</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Размещение отзывов ниже -->
 <h3>Отзывы</h3>
-<ul>
-    {% for review in reviews %}
-        <li>
-            <strong>{{ review.user.username }}</strong>: {{ review.comment }} ({{ review.rating }} из 5)
-        </li>
-    {% endfor %}
-</ul>
-<h3>Добавить отзыв</h3>
-<form method="post" action="{% url 'add_review' product_id=product.id %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Добавить</button>
-</form>
-<h3>Добавить в корзину</h3>
-<form method="post" action="{% url 'add_to_cart' product.id %}">
-    {% csrf_token %}
-    <button type="submit">Добавить в корзину</button>
-</form>
+<div class="reviews">
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="review-item">
+                <strong>{{ review.user.username }}</strong>: {{ review.comment }} ({{ review.rating }} из 5)
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Отзывов пока нет. Будьте первым, кто оставит отзыв!</p>
+    {% endif %}
+</div>
+
 {% endblock %}
