@@ -5,7 +5,9 @@ import sys
 from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
 from aiogram.types import Message
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from asgiref.sync import sync_to_async
 from django.db.models import Sum, F
 
@@ -50,7 +52,7 @@ async def start(message: Message):
                          "/user_activity - Активность пользователей\n"
                          "/product_popularity - Популярность продуктов")
 
-dp.message.register(start, commands=["start"])
+dp.message.register(start, Command("start"))
 
 # Команда /sales_report для получения отчета о продажах
 async def sales_report(message: Message):
@@ -81,7 +83,7 @@ async def sales_report(message: Message):
 
     await message.answer(report)
 
-dp.message.register(sales_report, commands=["sales_report"])
+dp.message.register(sales_report, Command("sales_report"))
 
 # Команда /user_activity для получения отчета об активности пользователей
 async def user_activity(message: Message):
@@ -94,7 +96,7 @@ async def user_activity(message: Message):
 
     await message.answer(report)
 
-dp.message.register(user_activity, commands=["user_activity"])
+dp.message.register(user_activity, Command("user_activity"))
 
 # Команда /product_popularity для получения отчета о популярности продуктов
 async def product_popularity(message: Message):
@@ -110,7 +112,7 @@ async def product_popularity(message: Message):
 
     await message.answer(report)
 
-dp.message.register(product_popularity, commands=["product_popularity"])
+dp.message.register(product_popularity, Command("product_popularity"))
 
 # Обработчик запуска aiohttp
 async def on_startup(app):
@@ -121,14 +123,23 @@ async def on_shutdown(app):
     await bot.delete_webhook()
 
 # Настройка приложения aiohttp
-app = web.Application()
-app.on_startup.append(on_startup)
-app.on_shutdown.append(on_shutdown)
+async def main():
+    app = web.Application()
+    app.on_startup.append(on_startup)
+    app.on_shutdown.append(on_shutdown)
 
-# Регистрация обработчиков и маршрутов для aiohttp
-dp.setup(app)
+    # Регистрация хэндлеров для webhook
+    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
 
-# Запуск приложения
+    # Запуск aiohttp приложения
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 5000)
+    await site.start()
+
+    # Ожидание завершения процесса
+    await asyncio.Event().wait()
+
 if __name__ == '__main__':
-    async with dp:
-        web.run_app(app, host='0.0.0.0', port=5000)
+    import asyncio
+    asyncio.run(main())
