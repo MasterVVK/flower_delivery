@@ -1,14 +1,13 @@
-# users/views.py
-
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.models import Session
 from .forms import CustomUserCreationForm
 from orders.models import Product, Cart, CartItem
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.sessions.models import Session
-
+from .models import Address
+from django.contrib import messages
+from dadata import Dadata
 import logging
 
 logger = logging.getLogger('my_custom_logger')
@@ -23,7 +22,6 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -70,7 +68,51 @@ def login_view(request):
         next_url = request.GET.get('next', '')
     return render(request, 'users/login.html', {'form': form, 'next': next_url})
 
-
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    addresses = request.user.addresses.all()
+    return render(request, 'users/profile.html', {'addresses': addresses})
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        street = request.POST['street']
+        city = request.POST['city']
+        state = request.POST['state']
+        postal_code = request.POST['postal_code']
+        country = request.POST['country']
+        is_default = 'is_default' in request.POST
+
+        if is_default:
+            request.user.addresses.update(is_default=False)
+
+        Address.objects.create(
+            user=request.user,
+            street=street,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            is_default=is_default
+        )
+
+        messages.success(request, 'Address added successfully!')
+        return redirect('profile')
+
+@login_required
+def search_address(request):
+    search_query = request.GET.get('search')
+    found_addresses = []
+
+    if search_query:
+        token = "4d54df628bb209885446263931d4d785955d21d3"
+        dadata = Dadata(token)
+        result = dadata.suggest("address", search_query)
+
+        for suggestion in result:
+            found_addresses.append({
+                'value': suggestion['value'],
+                'data': suggestion['data']
+            })
+
+    return render(request, 'users/profile.html', {'search_query': search_query, 'found_addresses': found_addresses})
