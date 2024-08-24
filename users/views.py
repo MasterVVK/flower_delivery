@@ -91,15 +91,37 @@ def set_default_address(request):
 def add_address_page(request):
     return render(request, 'users/add_address.html')
 
+
 @login_required
 def add_address(request):
     if request.method == 'POST':
-        street = request.POST['street']
-        city = request.POST['city']
-        state = request.POST['state']
-        postal_code = request.POST['postal_code']
-        country = request.POST['country']
+        full_address = request.POST['full_address']
         is_default = 'is_default' in request.POST
+
+        # Используем данные из результата поиска (suggest)
+        token = "4d54df628bb209885446263931d4d785955d21d3"
+        dadata = Dadata(token)
+
+        try:
+            result = dadata.suggest("address", full_address)
+            if not result:
+                messages.error(request, "Адрес не найден.")
+                return redirect('add_address_page')
+
+            # Берем первый результат из suggest
+            suggestion = result[0]['data']
+
+            # Извлекаем данные из результата
+            street = suggestion.get('street_with_type', '')
+            city = suggestion.get('city', '')
+            state = suggestion.get('region', '')
+            postal_code = suggestion.get('postal_code', '')
+            country = suggestion.get('country', 'Россия')
+
+        except Exception as e:
+            logger.error(f"Неизвестная ошибка: {str(e)}")
+            messages.error(request, "Произошла ошибка при обработке вашего запроса.")
+            return redirect('add_address_page')
 
         if is_default:
             request.user.addresses.update(is_default=False)
