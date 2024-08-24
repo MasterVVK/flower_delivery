@@ -5,64 +5,26 @@
   <p>Имя пользователя: {{ user.username }}</p>
   <p>Email: {{ user.email }}</p>
 
-  <h3>Адреса доставки</h3>
-  <ul>
-    {% for address in user.addresses.all %}
-      <li>
-        {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}, {{ address.country }}
-        {% if address.is_default %} (По умолчанию) {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+  <h3>Текущий адрес доставки по умолчанию</h3>
+  {% if default_address %}
+    <p>{{ default_address.street }}, {{ default_address.city }}, {{ default_address.state }}, {{ default_address.postal_code }}, {{ default_address.country }}</p>
+  {% else %}
+    <p>Адрес по умолчанию не установлен.</p>
+  {% endif %}
+
+  <h3>Выберите адрес по умолчанию</h3>
+  <form method="post" action="{% url 'set_default_address' %}">
+    {% csrf_token %}
+    <select name="default_address">
+      {% for address in addresses %}
+        <option value="{{ address.id }}" {% if address.is_default %}selected{% endif %}>
+          {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}, {{ address.country }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit">Установить как адрес по умолчанию</button>
+  </form>
 
   <h4>Добавить новый адрес</h4>
-  <form method="post" action="{% url 'add_address' %}">
-    {% csrf_token %}
-    <label for="street">Улица:</label>
-    <input type="text" id="street" name="street">
-    
-    <label for="city">Город:</label>
-    <input type="text" id="city" name="city">
-    
-    <label for="state">Штат/Область:</label>
-    <input type="text" id="state" name="state">
-    
-    <label for="postal_code">Почтовый индекс:</label>
-    <input type="text" id="postal_code" name="postal_code">
-    
-    <label for="country">Страна:</label>
-    <input type="text" id="country" name="country">
-    
-    <label for="is_default">Сделать адресом по умолчанию:</label>
-    <input type="checkbox" id="is_default" name="is_default">
-    
-    <button type="submit">Добавить адрес</button>
-  </form>
-  
-  <h4>Или найдите адрес по API</h4>
-  <form method="get" action="{% url 'search_address' %}">
-    <label for="search">Поиск адреса:</label>
-    <input type="text" id="search" name="search">
-    <button type="submit">Найти</button>
-  </form>
-
-  {% if found_addresses %}
-    <h4>Результаты поиска:</h4>
-    <ul>
-      {% for address in found_addresses %}
-        <li>
-          {{ address.value }}
-          <form method="post" action="{% url 'add_address' %}">
-            {% csrf_token %}
-            <input type="hidden" name="street" value="{{ address.data.street_with_type }}">
-            <input type="hidden" name="city" value="{{ address.data.city }}">
-            <input type="hidden" name="state" value="{{ address.data.region }}">
-            <input type="hidden" name="postal_code" value="{{ address.data.postal_code }}">
-            <input type="hidden" name="country" value="Россия">
-            <button type="submit">Добавить этот адрес</button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  <a href="{% url 'add_address_page' %}" class="btn btn-primary">Добавить новый адрес</a>
 {% endblock %}

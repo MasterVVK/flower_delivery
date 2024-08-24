@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Добавить новый адрес</h2>
+
+  <h4>Ввести адрес вручную</h4>
+  <form method="post" action="{% url 'add_address' %}">
+    {% csrf_token %}
+    <label for="street">Улица:</label>
+    <input type="text" id="street" name="street">
+    
+    <label for="city">Город:</label>
+    <input type="text" id="city" name="city">
+    
+    <label for="state">Штат/Область:</label>
+    <input type="text" id="state" name="state">
+    
+    <label for="postal_code">Почтовый индекс:</label>
+    <input type="text" id="postal_code" name="postal_code">
+    
+    <label for="country">Страна:</label>
+    <input type="text" id="country" name="country">
+    
+    <label for="is_default">Сделать адресом по умолчанию:</label>
+    <input type="checkbox" id="is_default" name="is_default">
+    
+    <button type="submit">Добавить адрес</button>
+  </form>
+
+  <h4>Или найдите адрес по API</h4>
+  <form method="get" action="{% url 'search_address' %}">
+    <label for="search">Поиск адреса:</label>
+    <input type="text" id="search" name="search">
+    <button type="submit">Найти</button>
+  </form>
+
+  {% if found_addresses %}
+    <h4>Результаты поиска:</h4>
+    <ul>
+      {% for address in found_addresses %}
+        <li>
+          {{ address.value }}
+          <form method="post" action="{% url 'add_address' %}">
+            {% csrf_token %}
+            <input type="hidden" name="street" value="{{ address.data.street_with_type }}">
+            <input type="hidden" name="city" value="{{ address.data.city }}">
+            <input type="hidden" name="state" value="{{ address.data.region }}">
+            <input type="hidden" name="postal_code" value="{{ address.data.postal_code }}">
+            <input type="hidden" name="country" value="Россия">
+            <button type="submit">Добавить этот адрес</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

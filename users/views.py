@@ -71,7 +71,25 @@ def login_view(request):
 @login_required
 def profile(request):
     addresses = request.user.addresses.all()
-    return render(request, 'users/profile.html', {'addresses': addresses})
+    default_address = request.user.addresses.filter(is_default=True).first()
+    return render(request, 'users/profile.html', {
+        'addresses': addresses,
+        'default_address': default_address
+    })
+
+@login_required
+def set_default_address(request):
+    if request.method == 'POST':
+        address_id = request.POST.get('default_address')
+        if address_id:
+            Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
+            Address.objects.filter(id=address_id, user=request.user).update(is_default=True)
+            messages.success(request, 'Адрес по умолчанию обновлен.')
+    return redirect('profile')
+
+@login_required
+def add_address_page(request):
+    return render(request, 'users/add_address.html')
 
 @login_required
 def add_address(request):
@@ -96,7 +114,7 @@ def add_address(request):
             is_default=is_default
         )
 
-        messages.success(request, 'Address added successfully!')
+        messages.success(request, 'Адрес добавлен успешно.')
         return redirect('profile')
 
 @login_required
@@ -115,4 +133,4 @@ def search_address(request):
                 'data': suggestion['data']
             })
 
-    return render(request, 'users/profile.html', {'search_query': search_query, 'found_addresses': found_addresses})
+    return render(request, 'users/add_address.html', {'search_query': search_query, 'found_addresses': found_addresses})
