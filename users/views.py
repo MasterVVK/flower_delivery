@@ -156,3 +156,25 @@ def search_address(request):
             })
 
     return render(request, 'users/add_address.html', {'search_query': search_query, 'found_addresses': found_addresses})
+
+@login_required
+def delete_address(request, address_id):
+    try:
+        address = get_object_or_404(Address, id=address_id, user=request.user)
+        address.delete()
+        messages.success(request, 'Адрес успешно удален.')
+    except Exception as e:
+        logger.error(f"Ошибка при удалении адреса: {str(e)}")
+        messages.error(request, 'Произошла ошибка при удалении адреса.')
+    return redirect('profile')
+
+@login_required
+def delete_selected_addresses(request):
+    if request.method == 'POST':
+        addresses_to_delete = request.POST.getlist('addresses_to_delete')
+        if addresses_to_delete:
+            Address.objects.filter(id__in=addresses_to_delete, user=request.user).delete()
+            messages.success(request, 'Выбранные адреса успешно удалены.')
+        else:
+            messages.error(request, 'Пожалуйста, выберите хотя бы один адрес для удаления.')
+    return redirect('profile')

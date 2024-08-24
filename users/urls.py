@@ -11,4 +11,6 @@ urlpatterns = [
     path('add_address/', views.add_address, name='add_address'),
     path('add_address_page/', views.add_address_page, name='add_address_page'),
     path('search_address/', views.search_address, name='search_address'),
+    path('delete_address/<int:address_id>/', views.delete_address, name='delete_address'),
+    path('delete_selected_addresses/', views.delete_selected_addresses, name='delete_selected_addresses'),
 ]

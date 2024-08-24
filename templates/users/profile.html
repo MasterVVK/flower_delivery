@@ -25,6 +25,23 @@
     <button type="submit">Установить как адрес по умолчанию</button>
   </form>
 
+  <h3>Список адресов</h3>
+  <form method="post" action="{% url 'delete_selected_addresses' %}">
+    {% csrf_token %}
+    <ul style="list-style: none; padding: 0;">
+      {% for address in addresses %}
+        <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span>
+            <input type="checkbox" name="addresses_to_delete" value="{{ address.id }}">
+            {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}, {{ address.country }}
+            {% if address.is_default %} <span>(По умолчанию)</span> {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-danger">Удалить выбранные адреса</button>
+  </form>
+
   <h4>Добавить новый адрес</h4>
   <a href="{% url 'add_address_page' %}" class="btn btn-primary">Добавить новый адрес</a>
 {% endblock %}
