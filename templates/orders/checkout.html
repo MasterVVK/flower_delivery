@@ -24,16 +24,25 @@
 <!-- Отображение общей суммы заказа -->
 <p class="order-total">Итого: {{ total }} руб.</p>
 
-<!-- Кнопки подтверждения и отмены -->
-<div class="order-buttons">
+<!-- Выбор адреса доставки -->
+{% if addresses %}
+    <h3>Выберите адрес доставки</h3>
     <form method="post" class="order-button-form">
         {% csrf_token %}
+        <select name="delivery_address" required>
+            {% for address in addresses %}
+                <option value="{{ address.id }}">{{ address.formatted_address }}</option>
+            {% endfor %}
+        </select>
         <button type="submit" class="confirm-button">Подтвердить заказ</button>
     </form>
+{% else %}
+    <p class="warning-message">У вас нет доступных адресов доставки. <a href="{% url 'add_address_page' %}">Добавить новый адрес</a>.</p>
+{% endif %}
 
-    <form action="{% url 'cart_detail' %}" method="get" class="order-button-form">
-        <button type="submit" class="cancel-button">Отменить</button>
-    </form>
-</div>
+<!-- Кнопка отмены -->
+<form action="{% url 'cart_detail' %}" method="get" class="order-button-form">
+    <button type="submit" class="cancel-button">Отменить</button>
+</form>
 
 {% endblock %}

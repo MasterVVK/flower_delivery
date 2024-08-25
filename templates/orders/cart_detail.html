@@ -38,7 +38,11 @@
         <form action="{% url 'index' %}" method="get" class="order-button-form">
             <button type="submit" class="continue-shopping-button">Продолжить покупки</button>
         </form>
-        <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
+        {% if user.addresses.exists %}
+            <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
+        {% else %}
+            <p class="warning-message">У вас нет доступных адресов доставки. <a href="{% url 'add_address_page' %}">Добавить новый адрес</a>.</p>
+        {% endif %}
     </div>
 
 {% else %}
@@ -50,7 +54,6 @@
     </div>
 
 {% endif %}
-
 
 <script>
 document.querySelectorAll('.quantity-button').forEach(button => {

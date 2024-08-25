@@ -6,6 +6,15 @@
 {% block content %}
 <h2>Детали заказа</h2>
 
+<!-- Информация об адресе доставки -->
+<div class="delivery-address">
+    <h3>Адрес доставки</h3>
+    <p>{{ order.delivery_address.street }}, {{ order.delivery_address.house }}, {{ order.delivery_address.flat }}</p>
+    <p>{{ order.delivery_address.city }}, {{ order.delivery_address.state }}, {{ order.delivery_address.postal_code }}</p>
+    <p>{{ order.delivery_address.country }}</p>
+</div>
+
+<!-- Контейнер для карточек товаров -->
 <div class="order-items-container">
     {% for item in order_products %}
     <div class="order-item-card">

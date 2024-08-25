@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .bot_utils import notify_new_order
 from django.contrib import messages
+from users.models import Address
 
 import logging
 
@@ -86,9 +87,11 @@ def remove_from_cart(request, product_id):
     cart_item.delete()
     return redirect('cart_detail')
 
+@login_required
 def checkout(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
+
     if request.method == 'POST':
         if not request.user.is_authenticated:
             logger.debug("User not authenticated, saving cart items in session")
@@ -107,7 +110,14 @@ def checkout(request):
                 logger.debug(f"Restored item {product.name} to cart with quantity {cart_item.quantity}")
             del request.session['cart_items']
 
-        order = Order.objects.create(user=request.user)
+        delivery_address_id = request.POST.get('delivery_address')
+        if not delivery_address_id:
+            messages.error(request, "Пожалуйста, выберите адрес доставки.")
+            return redirect('cart_detail')
+
+        delivery_address = get_object_or_404(Address, id=delivery_address_id, user=request.user)
+
+        order = Order.objects.create(user=request.user, delivery_address=delivery_address)
         logger.debug(f"Order created: {order.id}")
         for item in cart.items.all():
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
@@ -117,9 +127,16 @@ def checkout(request):
         notify_new_order(order)
         return redirect('order_detail', pk=order.pk)
 
-    return render(request, 'orders/checkout.html',
-                  {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
+    addresses = request.user.addresses.all() if request.user.is_authenticated else []
+    if not addresses.exists():
+        messages.warning(request, "У вас нет доступных адресов доставки. Пожалуйста, добавьте адрес.")
+        return redirect('add_address_page')
 
+    return render(request, 'orders/checkout.html', {
+        'cart_items': cart_items,
+        'total': sum(item.quantity * item.product.price for item in cart_items),
+        'addresses': addresses
+    })
 
 @login_required
 def order_detail(request, pk):
