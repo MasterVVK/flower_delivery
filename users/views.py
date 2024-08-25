@@ -120,17 +120,15 @@ def add_address(request):
 
             suggestion = result[0]['data']
 
-            street = suggestion.get('street_with_type', '')
+            street = suggestion.get('street_with_type', None)
             city = suggestion.get('city', suggestion.get('settlement_with_type', ''))
             state = suggestion.get('region_with_type', '')
             postal_code = suggestion.get('postal_code', '')
             house = suggestion.get('house', '')
             flat = suggestion.get('flat', '')
 
-            # Проверяем, что street не пустой
             if not street:
-                messages.error(request, "Не удалось определить улицу по введенному адресу. Пожалуйста, уточните адрес.")
-                return redirect('add_address_page')
+                street = "Улица не указана"
 
         except Exception as e:
             logger.error(f"Ошибка при взаимодействии с DaData: {str(e)}")
