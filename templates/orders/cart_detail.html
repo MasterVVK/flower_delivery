@@ -41,7 +41,7 @@
         {% if user.addresses.exists %}
             <a href="{% url 'checkout' %}" class="confirm-button">Оформить заказ</a>
         {% else %}
-            <p class="warning-message">У вас нет доступных адресов доставки. <a href="{% url 'add_address_page' %}">Добавить новый адрес</a>.</p>
+            <p class="warning-message">У вас нет доступных адресов доставки. Для оформления заказа пожалуйста, <a href="{% url 'add_address_page' %}">добавите адрес доставки.</a>.</p>
         {% endif %}
     </div>
 

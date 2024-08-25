@@ -129,7 +129,7 @@ def checkout(request):
 
     addresses = request.user.addresses.all() if request.user.is_authenticated else []
     if not addresses.exists():
-        messages.warning(request, "У вас нет доступных адресов доставки. Пожалуйста, добавьте адрес.")
+        messages.warning(request, "У вас нет доступных адресов доставки, чтобы оформить заказ, пожалуйста, добавьте адрес.")
         return redirect('add_address_page')
 
     return render(request, 'orders/checkout.html', {
