@@ -7,7 +7,7 @@
 
   <h3>Текущий адрес доставки по умолчанию</h3>
   {% if default_address %}
-    <p>{{ default_address.street }}, {{ default_address.city }}, {{ default_address.state }}, {{ default_address.postal_code }}, {{ default_address.country }}</p>
+    <p>{{ default_address.formatted_address }}</p>
   {% else %}
     <p>Адрес по умолчанию не установлен.</p>
   {% endif %}
@@ -18,7 +18,7 @@
     <select name="default_address">
       {% for address in addresses %}
         <option value="{{ address.id }}" {% if address.is_default %}selected{% endif %}>
-          {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}, {{ address.country }}
+          {{ address.formatted_address }}
         </option>
       {% endfor %}
     </select>
@@ -33,7 +33,7 @@
         <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <span>
             <input type="checkbox" name="addresses_to_delete" value="{{ address.id }}">
-            {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}, {{ address.country }}
+            {{ address.formatted_address }}
             {% if address.is_default %} <span>(По умолчанию)</span> {% endif %}
           </span>
         </li>

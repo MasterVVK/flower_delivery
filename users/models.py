@@ -42,3 +42,7 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.postal_code}, {self.country}"
+
+    @property
+    def formatted_address(self):
+        return f"{self.street}, {self.city}, {self.state}, {self.postal_code}, {self.country}"
