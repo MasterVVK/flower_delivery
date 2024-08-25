@@ -9,8 +9,22 @@ from .models import Address
 from django.contrib import messages
 from dadata import Dadata
 import logging
+import json
+import os
 
 logger = logging.getLogger('my_custom_logger')
+
+# Загрузка конфигурации из файла config.json
+config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')
+if not os.path.exists(config_path):
+    raise FileNotFoundError(f"Файл конфигурации не найден: {config_path}")
+
+with open(config_path) as config_file:
+    config = json.load(config_file)
+
+dadata_token = config.get('dadata_token')
+if not dadata_token:
+    raise ValueError("Токен DaData не найден в конфигурации")
 
 def register(request):
     if request.method == 'POST':
@@ -55,10 +69,9 @@ def login_view(request):
                     cart_item.save()
                 logger.info(f"User cart items after merging: {list(user_cart.items.all())}")
 
-            # Обработка параметра next
             next_url = request.POST.get('next') or request.GET.get('next')
-            if not next_url or next_url == 'index':  # Если next пуст или равен главной странице
-                next_url = 'index'  # Перенаправляем на главную страницу
+            if not next_url or next_url == 'index':
+                next_url = 'index'
 
             logger.info(f"Redirecting to: {next_url}")
 
@@ -91,15 +104,13 @@ def set_default_address(request):
 def add_address_page(request):
     return render(request, 'users/add_address.html')
 
-
 @login_required
 def add_address(request):
     if request.method == 'POST':
         full_address = request.POST['full_address']
         is_default = 'is_default' in request.POST
 
-        token = "4d54df628bb209885446263931d4d785955d21d3"  # Убедитесь, что токен сохранен в конфигурации
-        dadata = Dadata(token)
+        dadata = Dadata(dadata_token)
 
         try:
             result = dadata.suggest("address", full_address)
@@ -116,6 +127,11 @@ def add_address(request):
             house = suggestion.get('house', '')
             flat = suggestion.get('flat', '')
 
+            # Проверяем, что street не пустой
+            if not street:
+                messages.error(request, "Не удалось определить улицу по введенному адресу. Пожалуйста, уточните адрес.")
+                return redirect('add_address_page')
+
         except Exception as e:
             logger.error(f"Ошибка при взаимодействии с DaData: {str(e)}")
             messages.error(request, "Произошла ошибка при обработке вашего запроса.")
@@ -129,9 +145,9 @@ def add_address(request):
             street=street,
             city=city,
             state=state,
-            postal_code=postal_code,  # Почтовый индекс
-            house=house,  # Номер дома
-            flat=flat,  # Номер квартиры
+            postal_code=postal_code,
+            house=house,
+            flat=flat,
             country="Россия",
             is_default=is_default
         )
@@ -145,8 +161,7 @@ def search_address(request):
     found_addresses = []
 
     if search_query:
-        token = "4d54df628bb209885446263931d4d785955d21d3"
-        dadata = Dadata(token)
+        dadata = Dadata(dadata_token)
         result = dadata.suggest("address", search_query)
 
         for suggestion in result:
