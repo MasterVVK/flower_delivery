@@ -61,6 +61,7 @@ class Order(models.Model):
     status = models.CharField(_("Статус"), max_length=1, choices=STATUS_CHOICES, default='P')
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
     delivery_address = models.ForeignKey('users.Address', verbose_name=_("Адрес доставки"), on_delete=models.SET_NULL, null=True, blank=True)
+  
 
     def cancel(self):
         if self.status == 'P':
