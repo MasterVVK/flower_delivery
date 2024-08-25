@@ -36,8 +36,10 @@ class Address(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)  # Почтовый индекс
+    country = models.CharField(max_length=100, default="Россия")
+    house = models.CharField(max_length=20)  # Номер дома
+    flat = models.CharField(max_length=10, blank=True, null=True)  # Номер квартиры
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
@@ -45,4 +47,12 @@ class Address(models.Model):
 
     @property
     def formatted_address(self):
-        return f"{self.street}, {self.city}, {self.state}, {self.postal_code}, {self.country}"
+        address_parts = [
+            self.state,
+            self.city,
+            self.street,
+            f"д {self.house}",
+            f"кв {self.flat}" if self.flat else None
+        ]
+        return ', '.join(filter(None, address_parts))
+

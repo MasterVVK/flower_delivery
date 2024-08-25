@@ -98,8 +98,7 @@ def add_address(request):
         full_address = request.POST['full_address']
         is_default = 'is_default' in request.POST
 
-        # Используем данные из результата поиска (suggest)
-        token = "4d54df628bb209885446263931d4d785955d21d3"
+        token = "4d54df628bb209885446263931d4d785955d21d3"  # Убедитесь, что токен сохранен в конфигурации
         dadata = Dadata(token)
 
         try:
@@ -108,18 +107,17 @@ def add_address(request):
                 messages.error(request, "Адрес не найден.")
                 return redirect('add_address_page')
 
-            # Берем первый результат из suggest
             suggestion = result[0]['data']
 
-            # Извлекаем данные из результата
             street = suggestion.get('street_with_type', '')
-            city = suggestion.get('city', '')
-            state = suggestion.get('region', '')
+            city = suggestion.get('city', suggestion.get('settlement_with_type', ''))
+            state = suggestion.get('region_with_type', '')
             postal_code = suggestion.get('postal_code', '')
-            country = suggestion.get('country', 'Россия')
+            house = suggestion.get('house', '')
+            flat = suggestion.get('flat', '')
 
         except Exception as e:
-            logger.error(f"Неизвестная ошибка: {str(e)}")
+            logger.error(f"Ошибка при взаимодействии с DaData: {str(e)}")
             messages.error(request, "Произошла ошибка при обработке вашего запроса.")
             return redirect('add_address_page')
 
@@ -131,8 +129,10 @@ def add_address(request):
             street=street,
             city=city,
             state=state,
-            postal_code=postal_code,
-            country=country,
+            postal_code=postal_code,  # Почтовый индекс
+            house=house,  # Номер дома
+            flat=flat,  # Номер квартиры
+            country="Россия",
             is_default=is_default
         )
 
