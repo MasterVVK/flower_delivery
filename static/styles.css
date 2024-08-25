@@ -609,3 +609,46 @@ form button:hover {
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* Общий стиль для всех сообщений */
+.messages {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.messages li {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+/* Сообщение об успехе */
+.message-success {
+    background-color: #e7f3ff;
+    border: 1px solid #b3daff;
+    color: #31708f;
+}
+
+/* Сообщение об ошибке */
+.message-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+}
+
+/* Предупреждающее сообщение */
+.message-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+/* Информационное сообщение */
+.message-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
