@@ -1,9 +1,47 @@
-<!-- templates/users/profile.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
   <h2>Профиль пользователя</h2>
   <p>Имя пользователя: {{ user.username }}</p>
   <p>Email: {{ user.email }}</p>
+
+  <h3>Текущий адрес доставки по умолчанию</h3>
+  {% if default_address %}
+    <p>{{ default_address.formatted_address }}</p>
+  {% else %}
+    <p>Адрес по умолчанию не установлен.</p>
+  {% endif %}
+
+  <h3>Выберите адрес по умолчанию</h3>
+  <form method="post" action="{% url 'set_default_address' %}">
+    {% csrf_token %}
+    <select name="default_address">
+      {% for address in addresses %}
+        <option value="{{ address.id }}" {% if address.is_default %}selected{% endif %}>
+          {{ address.formatted_address }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit">Установить как адрес по умолчанию</button>
+  </form>
+
+  <h3>Список адресов</h3>
+  <form method="post" action="{% url 'delete_selected_addresses' %}">
+    {% csrf_token %}
+    <ul style="list-style: none; padding: 0;">
+      {% for address in addresses %}
+        <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span>
+            <input type="checkbox" name="addresses_to_delete" value="{{ address.id }}">
+            {{ address.formatted_address }}
+            {% if address.is_default %} <span>(По умолчанию)</span> {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-danger">Удалить выбранные адреса</button>
+  </form>
+
+  <h4>Добавить новый адрес</h4>
+  <a href="{% url 'add_address_page' %}" class="btn btn-primary">Добавить новый адрес</a>
 {% endblock %}

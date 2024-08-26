@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .bot_utils import notify_new_order
 from django.contrib import messages
+from users.models import Address
 
 import logging
 
@@ -18,7 +19,6 @@ def get_cart(request):
         cart, created = Cart.objects.get_or_create(user=request.user)
         logger.debug(f"User cart found or created: {cart.id} ")
 
-        # Если есть сессионная корзина, объединим её с корзиной пользователя
         session_key = request.session.session_key
         if session_key:
             logger.debug(f"Session key: {session_key}")
@@ -31,7 +31,7 @@ def get_cart(request):
                         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
                         if not created:
                             cart_item.quantity += item.quantity
-                        cart_item.save()
+                            cart_item.save()
                         logger.debug(f"Added item {item.product.name} (Quantity: {item.quantity}) to user cart")
 
                     guest_cart.delete()
@@ -49,7 +49,6 @@ def get_cart(request):
 
     return cart
 
-
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -59,7 +58,6 @@ def add_to_cart(request, product_id):
         session_key = request.session.session_key or request.session.create()
         cart, created = Cart.objects.get_or_create(session_key=session_key)
 
-    # Убедимся, что добавление товара происходит один раз
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
     if created:
         cart_item.quantity = 1
@@ -73,7 +71,6 @@ def add_to_cart(request, product_id):
     messages.success(request, 'Товар добавлен в корзину.')
     return redirect('cart_detail')
 
-
 def cart_detail(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
@@ -86,9 +83,11 @@ def remove_from_cart(request, product_id):
     cart_item.delete()
     return redirect('cart_detail')
 
+@login_required
 def checkout(request):
     cart = get_cart(request)
     cart_items = cart.items.all()
+
     if request.method == 'POST':
         if not request.user.is_authenticated:
             logger.debug("User not authenticated, saving cart items in session")
@@ -107,7 +106,14 @@ def checkout(request):
                 logger.debug(f"Restored item {product.name} to cart with quantity {cart_item.quantity}")
             del request.session['cart_items']
 
-        order = Order.objects.create(user=request.user)
+        delivery_address_id = request.POST.get('delivery_address')
+        if not delivery_address_id:
+            messages.error(request, "Пожалуйста, выберите адрес доставки.")
+            return redirect('cart_detail')
+
+        delivery_address = get_object_or_404(Address, id=delivery_address_id, user=request.user)
+
+        order = Order.objects.create(user=request.user, delivery_address=delivery_address)
         logger.debug(f"Order created: {order.id}")
         for item in cart.items.all():
             OrderProduct.objects.create(order=order, product=item.product, quantity=item.quantity)
@@ -117,9 +123,30 @@ def checkout(request):
         notify_new_order(order)
         return redirect('order_detail', pk=order.pk)
 
-    return render(request, 'orders/checkout.html',
-                  {'cart_items': cart_items, 'total': sum(item.quantity * item.product.price for item in cart_items)})
+    addresses = request.user.addresses.all() if request.user.is_authenticated else []
+    if not addresses.exists():
+        messages.warning(request, "У вас нет доступных адресов доставки, чтобы оформить заказ, пожалуйста, добавьте адрес.")
+        return redirect('add_address_page')
 
+    return render(request, 'orders/checkout.html', {
+        'cart_items': cart_items,
+        'total': sum(item.quantity * item.product.price for item in cart_items),
+        'addresses': addresses
+    })
+
+def repeat_order(request, order_id):
+    original_order = get_object_or_404(Order, id=order_id, user=request.user)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    for item in original_order.orderproduct_set.all():
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+        if not created:
+            cart_item.quantity += item.quantity
+        else:
+            cart_item.quantity = item.quantity
+        cart_item.save()
+
+    return redirect('cart_detail')
 
 @login_required
 def order_detail(request, pk):
@@ -129,36 +156,33 @@ def order_detail(request, pk):
     return render(request, 'orders/order_detail.html', {
         'order': order,
         'order_products': order_products,
-        'total': total,  # Передаем total в шаблон
+        'total': total,
     })
-
 
 def index(request):
     products = Product.objects.all()
 
     if request.user.is_authenticated:
         carts = Cart.objects.filter(user=request.user)
-        session_key = None  # Определяем переменную, чтобы избежать ошибки
+        session_key = None
     else:
-        # Проверка на наличие сессионного ключа
         session_key = request.session.session_key
         if not session_key:
-            request.session.create()  # Создаем новую сессию, если ее нет
+            request.session.create()
             session_key = request.session.session_key
 
         carts = Cart.objects.filter(session_key=session_key)
 
     if carts.exists():
-        cart = carts.first()  # Берем первую корзину, если их несколько
+        cart = carts.first()
         if carts.count() > 1:
-            # Объединяем корзины, если их больше одной
             for extra_cart in carts[1:]:
                 for item in extra_cart.items.all():
                     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
                     if not created:
                         cart_item.quantity += item.quantity
                     cart_item.save()
-                extra_cart.delete()  # Удаляем лишние корзины
+                extra_cart.delete()
     else:
         cart = Cart.objects.create(
             user=request.user if request.user.is_authenticated else None,
@@ -171,7 +195,6 @@ def index(request):
         'products': products,
         'cart_product_ids': cart_product_ids,
     })
-
 
 def load_more_products(request):
     page = request.GET.get('page', 1)
@@ -262,6 +285,26 @@ def delete_category(request, category_id):
     category.delete()
     return redirect('manage_products')
 
+@login_required
+@user_passes_test(is_manager)
+def manage_orders(request):
+    orders = Order.objects.all().order_by('-created_at')
+    return render(request, 'orders/manage_orders.html', {'orders': orders})
+
+@login_required
+@user_passes_test(is_manager)
+def edit_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order)  # Используем OrderForm
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Статус заказа обновлен.')
+            return redirect('manage_orders')
+    else:
+        form = OrderForm(instance=order)  # Используем OrderForm
+    return render(request, 'orders/edit_order_status.html', {'form': form, 'order': order})
+
 def product_list(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
     return render(request, 'orders/product_list.html', {'categories': categories})
@@ -271,7 +314,6 @@ def product_detail(request, pk):
     reviews = Review.objects.filter(product=product)
     user_review = None
 
-    # Проверка существующего отзыва пользователя, только если пользователь авторизован
     if request.user.is_authenticated:
         try:
             user_review = Review.objects.get(product=product, user=request.user)
@@ -296,7 +338,6 @@ def product_detail(request, pk):
         'user_review': user_review,
     })
 
-
 @login_required
 def order_create(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -305,7 +346,6 @@ def order_create(request, product_id):
         OrderProduct.objects.create(order=order, product=product, quantity=1)
         return redirect('order_detail', pk=order.pk)
     return render(request, 'orders/order_form.html', {'product': product})
-
 
 @login_required
 def add_review(request, product_id):
@@ -337,7 +377,6 @@ def add_review(request, product_id):
 def categories(request):
     categories = ProductCategory.objects.all().prefetch_related('products')
 
-    # Проверяем корзину: либо для авторизованного пользователя, либо по сессии
     if request.user.is_authenticated:
         cart, _ = Cart.objects.get_or_create(user=request.user)
     else:
@@ -348,10 +387,8 @@ def categories(request):
 
     return render(request, 'orders/categories.html', {
         'categories': categories,
-        'cart_product_ids': cart_product_ids,  # Передаем список товаров в корзине
+        'cart_product_ids': cart_product_ids,
     })
-
-
 
 def update_cart_item(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -391,11 +428,10 @@ def test_stars(request):
     ratings_data = []
 
     for rating in test_ratings:
-        width_percentage = rating * 20  # Вычисляем ширину в процентах
+        width_percentage = rating * 20
         ratings_data.append({
             'rating': rating,
             'width_percentage': width_percentage,
         })
 
     return render(request, 'orders/test_stars.html', {'ratings_data': ratings_data})
-

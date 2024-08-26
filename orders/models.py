@@ -53,19 +53,21 @@ class Order(models.Model):
         ('P', 'В ожидании'),
         ('C', 'Завершен'),
         ('F', 'Неудачно'),
-        ('X', 'Отменен'),  # Новый статус для отмены
+        ('X', 'Отменен'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Пользователь"), on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, verbose_name=_("Продукты"), through='OrderProduct')
+    products = models.ManyToManyField('Product', verbose_name=_("Продукты"), through='OrderProduct')
     status = models.CharField(_("Статус"), max_length=1, choices=STATUS_CHOICES, default='P')
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
+    delivery_address = models.ForeignKey('users.Address', verbose_name=_("Адрес доставки"), on_delete=models.SET_NULL, null=True, blank=True)
+
 
     def cancel(self):
         if self.status == 'P':
             self.status = 'X'
             self.save()
-            notify_order_cancellation(self)  # Добавляем уведомление при отмене
+            notify_order_cancellation(self)
 
     def __str__(self):
         return f"Заказ {self.id} от {self.user.username}"
@@ -73,8 +75,6 @@ class Order(models.Model):
     class Meta:
         verbose_name = _("Заказ")
         verbose_name_plural = _("Заказы")
-
-
 
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, verbose_name=_("Заказ"), on_delete=models.CASCADE)

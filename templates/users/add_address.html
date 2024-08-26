@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Добавить новый адрес</h2>
+
+  <h4>Найдите адрес по API</h4>
+  <form method="get" action="{% url 'search_address' %}">
+    <label for="search">Поиск адреса:</label>
+    <input type="text" id="search" name="search" placeholder="Введите адрес для поиска">
+    <button type="submit">Найти</button>
+  </form>
+
+  {% if found_addresses %}
+    <h4>Результаты поиска:</h4>
+    <ul>
+      {% for address in found_addresses %}
+        <li>
+          {{ address.value }}
+          <form method="post" action="{% url 'add_address' %}">
+            {% csrf_token %}
+            <input type="hidden" name="full_address" value="{{ address.value }}">
+            <label for="is_default">Сделать адресом по умолчанию:</label>
+            <input type="checkbox" id="is_default" name="is_default">
+            <button type="submit">Добавить этот адрес</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

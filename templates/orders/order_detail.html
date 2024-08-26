@@ -6,6 +6,19 @@
 {% block content %}
 <h2>Детали заказа</h2>
 
+<!-- Информация об адресе доставки -->
+<div class="delivery-address">
+    <h3>Адрес доставки</h3>
+    {% if order.delivery_address %}
+        <p>{{ order.delivery_address.street }}, {{ order.delivery_address.house }}, {{ order.delivery_address.flat }}</p>
+        <p>{{ order.delivery_address.city }}, {{ order.delivery_address.state }}, {{ order.delivery_address.postal_code }}</p>
+        <p>{{ order.delivery_address.country }}</p>
+    {% else %}
+        <p class="warning-message">Адрес доставки был удален.</p>
+    {% endif %}
+</div>
+
+<!-- Контейнер для карточек товаров -->
 <div class="order-items-container">
     {% for item in order_products %}
     <div class="order-item-card">
@@ -22,6 +35,24 @@
 
 <p class="order-total">Итого: {{ total }} руб.</p>
 
-<a href="{% url 'order_list' %}" class="confirm-button">Вернуться к заказам</a>
+<!-- Действия с заказом -->
+<div class="order-actions">
+    <!-- Кнопка для возврата к заказам -->
+    <a href="{% url 'order_list' %}" class="action-button return-button">Вернуться к заказам</a>
+    
+    <!-- Форма для повторения заказа -->
+    <form action="{% url 'repeat_order' order.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="action-button repeat-button">Повторить заказ</button>
+    </form>
+
+    {% if order.status == 'P' %}
+        <!-- Форма для отмены заказа -->
+        <form action="{% url 'cancel_order' order.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-button cancel-button">Отменить заказ</button>
+        </form>
+    {% endif %}
+</div>
 
 {% endblock %}
