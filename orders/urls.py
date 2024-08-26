@@ -28,5 +28,7 @@ urlpatterns = [
     path('orders/', views.order_list, name='order_list'),
     path('orders/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('repeat_order/<int:order_id>/', views.repeat_order, name='repeat_order'),
+    path('manage_orders/', views.manage_orders, name='manage_orders'),
+    path('edit_order_status/<int:order_id>/', views.edit_order_status, name='edit_order_status'),
     path('test-stars/', views.test_stars, name='test_stars'),
 ]

@@ -72,8 +72,8 @@
                         </form>
                     </li>
                     {% if user.role == 'Manager' or user.role == 'Admin' %}
-                        <li><a href="{% url 'manage_products' %}">Администрирование</a></li>
-                    {% endif %}
+                        <li><a href="{% url 'manage_products' %}">Редактирование</a></li>
+                        <li><a href="{% url 'manage_orders' %}">Управление заказами</a></li>                    {% endif %}
                 {% else %}
                     <li><a href="{% url 'login' %}">Войти</a></li>
                     <li><a href="{% url 'register' %}">Регистрация</a></li>

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление заказами{% endblock %}
+
+{% block content %}
+<h2>Управление заказами</h2>
+
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>ID заказа</th>
+            <th>Пользователь</th>
+            <th>Дата создания</th>
+            <th>Статус</th>
+            <th>Общая сумма</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.user.username }}</td>
+            <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>{{ order.total }} руб.</td>
+            <td>
+                <a href="{% url 'edit_order_status' order.id %}">Изменить статус</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
