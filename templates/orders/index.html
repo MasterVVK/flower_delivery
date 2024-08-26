@@ -21,7 +21,7 @@
 
                 <!-- Рейтинг под названием товара -->
                 <div class="product-rating">
-                    <span class="rating-value">{{ product.avg_rating|floatformat:1 }}</span> <!-- Рейтинг с округлением до десятых -->
+                    <span class="rating-value">{{ product.avg_rating|floatformat:1 }}</span>
                     <div class="stars-svg">
                         {% if product.avg_rating %}
                             {% for i in "12345" %}
@@ -32,18 +32,15 @@
                                 {% endif %}
                             {% endfor %}
                         {% else %}
-                            <!-- Если отзывов нет, отображаем серые звезды -->
                             {% for i in "12345" %}
                                 <img src="{% static 'icons/star-gray.svg' %}" class="star" width="16" height="16"/>
                             {% endfor %}
                         {% endif %}
                     </div>
-                    <!-- Добавляем количество отзывов в скобках -->
                     {% if product.reviews.count > 0 %}
                         <span class="review-count">({{ product.reviews.count }})</span>
                     {% endif %}
                 </div>
-
 
                 <!-- Кнопка добавления в корзину -->
                 {% if product.id in cart_product_ids %}
@@ -62,13 +59,14 @@
 <script>
     let page = 2;
     let isLoading = false;
+    let totalProducts = {{ total_products }};  // Передайте это значение из представления
 
     function bindAddToCartButtons() {
         const buttons = document.querySelectorAll('.add-to-cart-button');
 
         buttons.forEach(button => {
-            button.removeEventListener('click', handleAddToCart);  // Удаление старого обработчика
-            button.addEventListener('click', handleAddToCart);  // Добавление нового обработчика
+            button.removeEventListener('click', handleAddToCart);
+            button.addEventListener('click', handleAddToCart);
         });
     }
 
@@ -100,12 +98,8 @@
         .catch(error => console.error('Ошибка:', error));
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        bindAddToCartButtons();  // Привязываем обработчики при загрузке страницы
-    });
-
     function loadMoreProducts() {
-        if (isLoading) return;
+        if (isLoading || totalProducts <= 20) return;
         isLoading = true;
         document.getElementById('loading').style.display = 'block';
 
@@ -114,7 +108,6 @@
             .then(data => {
                 const productList = document.getElementById('product-list');
                 data.products.forEach(product => {
-                    // Проверяем, есть ли уже продукт с таким id в списке
                     if (!document.getElementById('product-' + product.id)) {
                         const productItem = document.createElement('div');
                         productItem.classList.add('product-item');
@@ -136,7 +129,7 @@
                 if (!data.has_next) {
                     window.removeEventListener('scroll', handleScroll);
                 }
-                bindAddToCartButtons();  // Привязываем обработчики к новым элементам
+                bindAddToCartButtons();
             })
             .catch(error => {
                 console.error('Ошибка:', error);
@@ -154,6 +147,12 @@
         }
     }
 
-    window.addEventListener('scroll', handleScroll);
+    if (totalProducts > 20) {
+        window.addEventListener('scroll', handleScroll);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindAddToCartButtons();
+    });
 </script>
 {% endblock %}
