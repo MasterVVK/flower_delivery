@@ -138,6 +138,30 @@ def checkout(request):
         'addresses': addresses
     })
 
+
+def repeat_order(request, order_id):
+    # Получаем исходный заказ
+    original_order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Получаем или создаем корзину для пользователя
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    # Копируем продукты из оригинального заказа в новую корзину
+    for item in original_order.orderproduct_set.all():
+        # Проверяем, есть ли такой продукт уже в корзине
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+        if not created:
+            # Если продукт уже в корзине, увеличиваем количество
+            cart_item.quantity += item.quantity
+            cart_item.save()
+        else:
+            # Если продукт не в корзине, создаем новую запись
+            cart_item.quantity = item.quantity
+            cart_item.save()
+
+    # Перенаправляем пользователя на страницу корзины
+    return redirect('cart_detail')
+
 @login_required
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)

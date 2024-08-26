@@ -35,6 +35,24 @@
 
 <p class="order-total">Итого: {{ total }} руб.</p>
 
-<a href="{% url 'order_list' %}" class="confirm-button">Вернуться к заказам</a>
+<!-- Действия с заказом -->
+<div class="order-actions">
+    <!-- Кнопка для возврата к заказам -->
+    <a href="{% url 'order_list' %}" class="action-button return-button">Вернуться к заказам</a>
+    
+    <!-- Форма для повторения заказа -->
+    <form action="{% url 'repeat_order' order.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="action-button repeat-button">Повторить заказ</button>
+    </form>
+
+    {% if order.status == 'P' %}
+        <!-- Форма для отмены заказа -->
+        <form action="{% url 'cancel_order' order.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-button cancel-button">Отменить заказ</button>
+        </form>
+    {% endif %}
+</div>
 
 {% endblock %}

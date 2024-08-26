@@ -32,6 +32,10 @@
                         <button type="submit" class="cancel-button">Отменить</button>
                     </form>
                 {% endif %}
+                <form action="{% url 'repeat_order' order.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                     <button type="submit" class="repeat-button">Повторить заказ</button>
+                </form>
             </td>
         </tr>
         {% endfor %}

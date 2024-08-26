@@ -652,3 +652,41 @@ form button:hover {
     border: 1px solid #bee5eb;
     color: #0c5460;
 }
+
+.order-actions .action-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    min-width: 100px; /* Минимальная ширина для всех кнопок */
+    margin: 0 5px;
+    flex: 1; /* Равномерное распределение оставшегося пространства */
+}
+
+.order-actions {
+    display: flex;
+    justify-content: center; /* Выравнивание кнопок по центру */
+    margin-top: 20px;
+    gap: 10px;
+}
+
+
+.order-actions .cancel-button {
+    background-color: #f44336; /* Красный цвет для отмены */
+}
+
+.order-actions .repeat-button {
+    background-color: #4CAF50; /* Зеленый цвет для повторения */
+}
+
+.order-actions .return-button {
+    background-color: #007BFF; /* Синий цвет для возврата */
+}
+
+.order-actions .action-button:hover {
+    opacity: 0.8; /* Эффект при наведении */
+}
